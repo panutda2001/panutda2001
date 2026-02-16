@@ -1,6 +1,6 @@
 ## Hi there 👋
-    *Design:* User Research, Wireframing, Prototyping, Design Systems, Figma, Adobe Photoshop.
-   *Developer:* HTML5, CSS3, JavaScript (ES6+), Vue.js, Node-RED, MQTT, Git.
+   ## Design: User Research, Wireframing, Prototyping, Design Systems, Figma, Adobe Photoshop.
+   ## Developer:* HTML5, CSS3, JavaScript (ES6+), Vue.js, Node-RED, MQTT, Git.
 <!--
 **panutda2001/panutda2001** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
