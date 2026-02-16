@@ -11,7 +11,7 @@
 <b>&nbsp;&nbsp;&nbsp;&nbsp; Development:</b> Vue.js, JavaScript (ES6+), HTML5, CSS3, Git.
 <br><b>&nbsp;&nbsp;&nbsp;&nbsp; Tools:</b> Node-RED, MQTT.</br>
 
-<b>🏆 Key Projects:/b>
+<b>🏆 Key Projects:</b>
 <br><b>&nbsp;&nbsp;&nbsp;&nbsp; BMS for Solar Cell (Senior Project):</b> Designed and developed a real-time monitoring dashboard for battery \status and energy usage using Vue.js. </br>
 <b>&nbsp;&nbsp;&nbsp;&nbsp; EV Charging App:</b> Designed end-to-end interfaces for EV charging applications at Kitmeechai Electric.
 
