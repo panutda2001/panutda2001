@@ -1,0 +1,2207 @@
+[
+    {
+        "id": "29ef5ab389a0861f",
+        "type": "e-mail",
+        "z": "cfe215a1ee91cf68",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "authtype": "BASIC",
+        "saslformat": true,
+        "token": "oauth2Response.access_token",
+        "secure": true,
+        "tls": true,
+        "name": "kmce.panutda@gmail.com",
+        "dname": "kmce.panutda@gmail.com",
+        "x": 2160,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "728624cf6736ba4d",
+        "type": "comment",
+        "z": "cfe215a1ee91cf68",
+        "name": "Prosper",
+        "info": "",
+        "x": 130,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "51ae1d847ea0ee53",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "debug 658",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 950,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "5435b94731b79b90",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "setProsper",
+        "func": "var uid = msg.topic.split(\"/\");\nvar data = msg.payload;\nvar timestamp = Date.now();\n\n// ดึงข้อมูลเวลาที่บันทึกล่าสุดสำหรับ uid ที่ระบุ\nvar lastSavedTimestamp = flow.get('lastSavedTimestamp' + uid[1]);\n// Check if 2 minutes have passed since the last save\nif (!lastSavedTimestamp || (timestamp - lastSavedTimestamp) >= 120000 || (data[1] != 12 || data[1] != 2)) {\n    const date = new Date(timestamp + (7 * 60 * 60 * 1000));\n    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;\n\n    var strdata = formattedDate + \",\" + //Datetimes\n        data[0] + \",\" +  //HeadCode:\n        data[1] +\",\" + //SendOrder:\n        ((data[3] << 8) + data[2]) + \",\" +    //Voltage:\n        ((data[5] << 8) + data[4]) + \",\" +    //Current:\n        ((data[7] << 8) + data[6]) + \",\" +    //Power:\n        ((data[9] << 8) + data[8]) + \",\" +    //Days:\n        data[10] + \",\" +    //LeakageCurrent: \n        data[11] + \",\" +    //PowerFactor: \n        data[12] + \",\" +    //ONOFF: \n        data[13] + \",\" +    //FaultStuation: \n        data[14] + \",\" +    //LeakageSetValue:\n        data[15] + \",\" +    //RateOfCurrentSetValue: \n        ((data[17] << 8) + data[16]) + \",\" +  //UnderVoltSet:\n        ((data[19] << 8) + data[18]) + \",\" +  //OverVoltageSet: \n        data[20] + \",\" +    //TripSelectBit: \n        data[21] + \",\" +    //Lern_Flag: \n        data[22] + \",\" +    //Carrent_Offset: \n        data[23] + \",\" +    //WaveStyle1: \n        data[24] + \",\" +    //WaveStyle2: \n        data[25] + \",\" +    //\"LearnWaveCode1\": \n        data[26] + \",\" +    //LearnWaveCode2: \n        data[27] + \",\" +    //LearnWaveCode3:\n        data[28] + \",\" +    //LearnWaveCode4: \n        data[29] + \",\" +    //HF: \n        data[30] + \",\" +    //SoftwareCode: \n        data[31] + \",\" +    //ArcCode: \n        data[32] + \",\" +    //Temperature: \n        ((data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33]) + \",\" +  //MacAddress: \n        ((data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39]) + \",\" +    //Dumy: \n        ((data[55] << 8) + data[54]) + \",\" +  //Years: \n        data[56] + \",\" +    //Month: \n        data[57] + \",\" +    //Day: \n        data[58] + \",\" +    //Hours: \n        data[59] + \",\" +    //Minutes: \n        data[60] + \",\" +    // Seconds: \n        data[61] + \",\" +    //WeekDay: \n        ((data[63] << 8) + data[62])  \n\n    var data1 = flow.get('newdata' + uid[1]);\n    var data2 = strdata + \"\\n\" + data1 ;\n    flow.set(\"newdata\" + uid[1], data2);\n    // บันทึกเวลาที่ใช้ล่าสุด\n    flow.set('lastSavedTimestamp' + uid[1], timestamp);\n}\n// msg.payload = flow.get('newdata' + uid[1]);\nmsg.payload = data2;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 120,
+        "wires": [
+            [
+                "51ae1d847ea0ee53"
+            ]
+        ]
+    },
+    {
+        "id": "68040394e9d93493",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "debug 661",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "81af8fc6e56dbbb6",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "setProsper",
+        "func": "var uid = msg.topic.split(\"/\");\nvar data = msg.payload;\nvar timestamp = Date.now();\n\n// ดึงข้อมูลเวลาที่บันทึกล่าสุดสำหรับ uid ที่ระบุ\nvar lastSavedTimestamp = flow.get('lastSavedTimestamp' + uid[1]);\n// Check if 2 minutes have passed since the last save\nif (!lastSavedTimestamp || (timestamp - lastSavedTimestamp) >= 120000 || (data[1] != 12 || data[1] != 2)) {\n    const date = new Date(timestamp + (7 * 60 * 60 * 1000));\n    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;\n\n    var strdata = formattedDate + \",\" + //Datetimes\n        data[0] + \",\" +  //HeadCode:\n        data[1] + \",\" + //SendOrder:\n        ((data[3] << 8) + data[2]) + \",\" +    //Voltage:\n        ((data[5] << 8) + data[4]) + \",\" +    //Current:\n        ((data[7] << 8) + data[6]) + \",\" +    //Power:\n        ((data[9] << 8) + data[8]) + \",\" +    //Days:\n        data[10] + \",\" +    //LeakageCurrent: \n        data[11] + \",\" +    //PowerFactor: \n        data[12] + \",\" +    //ONOFF: \n        data[13] + \",\" +    //FaultStuation: \n        data[14] + \",\" +    //LeakageSetValue:\n        data[15] + \",\" +    //RateOfCurrentSetValue: \n        ((data[17] << 8) + data[16]) + \",\" +  //UnderVoltSet:\n        ((data[19] << 8) + data[18]) + \",\" +  //OverVoltageSet: \n        data[20] + \",\" +    //TripSelectBit: \n        data[21] + \",\" +    //Lern_Flag: \n        data[22] + \",\" +    //Carrent_Offset: \n        data[23] + \",\" +    //WaveStyle1: \n        data[24] + \",\" +    //WaveStyle2: \n        data[25] + \",\" +    //\"LearnWaveCode1\": \n        data[26] + \",\" +    //LearnWaveCode2: \n        data[27] + \",\" +    //LearnWaveCode3:\n        data[28] + \",\" +    //LearnWaveCode4: \n        data[29] + \",\" +    //HF: \n        data[30] + \",\" +    //SoftwareCode: \n        data[31] + \",\" +    //ArcCode: \n        data[32] + \",\" +    //Temperature: \n        ((data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33]) + \",\" +  //MacAddress: \n        ((data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39]) + \",\" +    //Dumy: \n        ((data[55] << 8) + data[54]) + \",\" +  //Years: \n        data[56] + \",\" +    //Month: \n        data[57] + \",\" +    //Day: \n        data[58] + \",\" +    //Hours: \n        data[59] + \",\" +    //Minutes: \n        data[60] + \",\" +    // Seconds: \n        data[61] + \",\" +    //WeekDay: \n        ((data[63] << 8) + data[62])\n\n    var data1 = flow.get('newdata' + uid[1]);\n    var data2 = strdata + \"\\n\" + data1 ;\n    flow.set(\"newdata\" + uid[1], data2);\n    // บันทึกเวลาที่ใช้ล่าสุด\n    flow.set('lastSavedTimestamp' + uid[1], timestamp);\n}\n// msg.payload = flow.get('newdata' + uid[1]);\nmsg.payload = data2;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 180,
+        "wires": [
+            [
+                "68040394e9d93493"
+            ]
+        ]
+    },
+    {
+        "id": "5eefcc9f782b4350",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataProsper2.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1480,
+        "y": 120,
+        "wires": [
+            [
+                "8cbb139e465c0941"
+            ]
+        ]
+    },
+    {
+        "id": "8cbb139e465c0941",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataProsper2.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1640,
+        "y": 120,
+        "wires": [
+            [
+                "40fb797c1bfcf51b"
+            ]
+        ]
+    },
+    {
+        "id": "40fb797c1bfcf51b",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "S2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1790,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "b088ab4449b72652",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "18000",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 1150,
+        "y": 120,
+        "wires": [
+            [
+                "7a9fac7f07b430b3"
+            ]
+        ]
+    },
+    {
+        "id": "7a9fac7f07b430b3",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"80d3294bcd1741af803\"\nvar dataP = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \"+ \"\\n\" + flow.get('newdata'+ uid)  \nmsg.payload = dataP \nflow.set(\"newdata\" + uid, \"\")\nreturn msg ;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1310,
+        "y": 120,
+        "wires": [
+            [
+                "5eefcc9f782b4350"
+            ]
+        ]
+    },
+    {
+        "id": "7828604c1c54f8e8",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "Prosper_TRADER3P.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1520,
+        "y": 240,
+        "wires": [
+            [
+                "796468019e34bab7"
+            ]
+        ]
+    },
+    {
+        "id": "796468019e34bab7",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "Prosper_TRADER3P.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1680,
+        "y": 240,
+        "wires": [
+            [
+                "0ceee74d5cde384f"
+            ]
+        ]
+    },
+    {
+        "id": "9d09b01d77157076",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"2d25e3f0282b44da97e\"\nvar data3P = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, PhaseBit, VoltOffsetValue, XValue, PhaseID, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get(\"newdata\"+uid)\nmsg.payload = data3P \nflow.set(\"newdata\"+uid, \"\")\nreturn msg ;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 240,
+        "wires": [
+            [
+                "7828604c1c54f8e8"
+            ]
+        ]
+    },
+    {
+        "id": "1a700dd40f6bd8de",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "Prosper_OUTLET1P.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1520,
+        "y": 180,
+        "wires": [
+            [
+                "39ec2dc89a85e12f"
+            ]
+        ]
+    },
+    {
+        "id": "39ec2dc89a85e12f",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "Prosper_OUTLET1P.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1680,
+        "y": 180,
+        "wires": [
+            [
+                "8c0552cbfac66d40"
+            ]
+        ]
+    },
+    {
+        "id": "8c0552cbfac66d40",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "ธัช ธงภักดิ์",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1860,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "b2810eaf9d7b6473",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"2f8faf73580c4a18915\"\nvar dataP = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \"+ \"\\n\" + flow.get('newdata'+ uid)  \nmsg.payload = dataP \nflow.set(\"newdata\" + uid, \"\")\nreturn msg ;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 180,
+        "wires": [
+            [
+                "1a700dd40f6bd8de"
+            ]
+        ]
+    },
+    {
+        "id": "0ceee74d5cde384f",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "TREDER3P",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1870,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "5c479a72720939e2",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "18000",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 1190,
+        "y": 180,
+        "wires": [
+            [
+                "b2810eaf9d7b6473"
+            ]
+        ]
+    },
+    {
+        "id": "5435305c5553ef41",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "18000",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 1190,
+        "y": 240,
+        "wires": [
+            [
+                "9d09b01d77157076"
+            ]
+        ]
+    },
+    {
+        "id": "2f514cc67dedf56b",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "Prosper_FULL3P.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1520,
+        "y": 300,
+        "wires": [
+            [
+                "fa9b309be7f118f4"
+            ]
+        ]
+    },
+    {
+        "id": "fa9b309be7f118f4",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "Prosper_FULL3P.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1680,
+        "y": 300,
+        "wires": [
+            [
+                "869f53fbaf49cbb6"
+            ]
+        ]
+    },
+    {
+        "id": "586a132b6d9952f2",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"e71360b485424206ae8\"\nvar data3P = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, PhaseBit, VoltOffsetValue, XValue, PhaseID, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get(\"newdata\"+uid)\nmsg.payload = data3P \nflow.set(\"newdata\"+uid, \"\")\nreturn msg ;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 300,
+        "wires": [
+            [
+                "2f514cc67dedf56b"
+            ]
+        ]
+    },
+    {
+        "id": "869f53fbaf49cbb6",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "FULL3P",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1860,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "d71054ebebc52bcc",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "18000",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 1190,
+        "y": 300,
+        "wires": [
+            [
+                "586a132b6d9952f2"
+            ]
+        ]
+    },
+    {
+        "id": "c33078b85e6b9eea",
+        "type": "comment",
+        "z": "cfe215a1ee91cf68",
+        "name": "Millennium",
+        "info": "",
+        "x": 140,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "325ca78b05c7b327",
+        "type": "comment",
+        "z": "cfe215a1ee91cf68",
+        "name": "MARQ",
+        "info": "",
+        "x": 150,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "0f96389868d9025a",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "setProsper3P",
+        "func": "var uid = msg.topic.split(\"/\");\nvar data = msg.payload;\nvar timestamp = Date.now()\n\n// ดึงข้อมูลเวลาที่บันทึกล่าสุดสำหรับ uid ที่ระบุ ++\nvar lastSavedTimestamp = flow.get('lastSavedTimestamp' + uid[1] + data[31]);\n// Check if 2 minutes have passed since the last save\nif (!lastSavedTimestamp || (timestamp - lastSavedTimestamp) >= 120000 || (data[1] != 12 || data[1] != 2)) {\n    const date = new Date(timestamp + (7 * 60 * 60 * 1000));\n    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;\n\n    msg.payload = [formattedDate + \",\" + //Datetimes\n        data[0] + \",\" +  //HeadCode:\n        data[1] + \",\" + //SendOrder:\n        ((data[3] << 8) + data[2]) + \",\" +    //Voltage:\n        ((data[5] << 8) + data[4]) + \",\" +    //Current:\n        ((data[7] << 8) + data[6]) + \",\" +    //Power:\n        ((data[9] << 8) + data[8]) + \",\" +    //Days:\n        data[10] + \",\" +    //LeakageCurrent: \n        data[11] + \",\" +    //PowerFactor: \n        data[12] + \",\" +    //ONOFF: \n        data[13] + \",\" +    //FaultStuation: \n        data[14] + \",\" +    //LeakageSetValue:\n        data[15] + \",\" +    //RateOfCurrentSetValue: \n        ((data[17] << 8) + data[16]) + \",\" +  //UnderVoltSet:\n        ((data[19] << 8) + data[18]) + \",\" +  //OverVoltageSet: \n        data[20] + \",\" +    //TripSelectBit: \n        data[21] + \",\" +    //Lern_Flag: \n        data[22] + \",\" +    //Carrent_Offset: \n        data[23] + \",\" +    //WaveStyle1: \n        data[24] + \",\" +    //WaveStyle2: \n        data[25] + \",\" +    //\"LearnWaveCode1\": \n        data[26] + \",\" +    //LearnWaveCode2: \n        data[27] + \",\" +    //LearnWaveCode3:\n        data[28] + \",\" +    //PhaseBit: \n        data[29] + \",\" +    //VoltOffsetValue: \n        data[30] + \",\" +    //XValue: \n        data[31] + \",\" +    //PhaseID: \n        data[32] + \",\" +    //Temperature: \n        ((data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33]) + \",\" +  //MacAddress: \n        ((data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39]) + \",\" +    //Dummy: \n        ((data[55] << 8) + data[54]) + \",\" +  //Years: \n        data[56] + \",\" +    //Month: \n        data[57] + \",\" +    //Day: \n        data[58] + \",\" +    //Hours: \n        data[59] + \",\" +    //Minutes: \n        data[60] + \",\" +    // Seconds: \n        data[61] + \",\" +    //WeekDay: \n        ((data[63] << 8) + data[62]),  //UploadCount: \n    ]\n    var data1 = flow.get('newdata' + uid[1])\n    var data2 = msg.payload + \"\\n\" + data1\n    flow.set(\"newdata\" + uid[1], data2)\n    // บันทึกเวลาที่ใช้ล่าสุด\n    flow.set('lastSavedTimestamp' + uid[1], timestamp);\n\n}\nmsg.payload = data2\nmsg.uid = uid[1]\n// flow.set(\"newdata\", \"\") //clear\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 240,
+        "wires": [
+            [
+                "563eae625c52bb18"
+            ]
+        ]
+    },
+    {
+        "id": "563eae625c52bb18",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "debug 838",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "81ca7a98171fd34d",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "setProsper3P",
+        "func": "var uid = msg.topic.split(\"/\");\nvar data = msg.payload;\nvar timestamp = Date.now()\n\n// ดึงข้อมูลเวลาที่บันทึกล่าสุดสำหรับ uid ที่ระบุ ++\nvar lastSavedTimestamp = flow.get('lastSavedTimestamp' + uid[1] + data[31]);\n// Check if 2 minutes have passed since the last save\nif (!lastSavedTimestamp || (timestamp - lastSavedTimestamp) >= 120000 || (data[1] != 12 || data[1] != 2)) {\n    const date = new Date(timestamp + (7 * 60 * 60 * 1000));\n    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;\n\n    msg.payload = [formattedDate + \",\" + //Datetimes\n        data[0] + \",\" +  //HeadCode:\n        data[1] + \",\" + //SendOrder:\n        ((data[3] << 8) + data[2]) + \",\" +    //Voltage:\n        ((data[5] << 8) + data[4]) + \",\" +    //Current:\n        ((data[7] << 8) + data[6]) + \",\" +    //Power:\n        ((data[9] << 8) + data[8]) + \",\" +    //Days:\n        data[10] + \",\" +    //LeakageCurrent: \n        data[11] + \",\" +    //PowerFactor: \n        data[12] + \",\" +    //ONOFF: \n        data[13] + \",\" +    //FaultStuation: \n        data[14] + \",\" +    //LeakageSetValue:\n        data[15] + \",\" +    //RateOfCurrentSetValue: \n        ((data[17] << 8) + data[16]) + \",\" +  //UnderVoltSet:\n        ((data[19] << 8) + data[18]) + \",\" +  //OverVoltageSet: \n        data[20] + \",\" +    //TripSelectBit: \n        data[21] + \",\" +    //Lern_Flag: \n        data[22] + \",\" +    //Carrent_Offset: \n        data[23] + \",\" +    //WaveStyle1: \n        data[24] + \",\" +    //WaveStyle2: \n        data[25] + \",\" +    //\"LearnWaveCode1\": \n        data[26] + \",\" +    //LearnWaveCode2: \n        data[27] + \",\" +    //LearnWaveCode3:\n        data[28] + \",\" +    //PhaseBit: \n        data[29] + \",\" +    //VoltOffsetValue: \n        data[30] + \",\" +    //XValue: \n        data[31] + \",\" +    //PhaseID: \n        data[32] + \",\" +    //Temperature: \n        ((data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33]) + \",\" +  //MacAddress: \n        ((data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39]) + \",\" +    //Dummy: \n        ((data[55] << 8) + data[54]) + \",\" +  //Years: \n        data[56] + \",\" +    //Month: \n        data[57] + \",\" +    //Day: \n        data[58] + \",\" +    //Hours: \n        data[59] + \",\" +    //Minutes: \n        data[60] + \",\" +    // Seconds: \n        data[61] + \",\" +    //WeekDay: \n        ((data[63] << 8) + data[62]),  //UploadCount: \n    ]\n    var data1 = flow.get('newdata' + uid[1])\n    var data2 = msg.payload + \"\\n\" + data1\n    flow.set(\"newdata\" + uid[1], data2)\n    // บันทึกเวลาที่ใช้ล่าสุด\n    flow.set('lastSavedTimestamp' + uid[1], timestamp);\n\n}\nmsg.payload = data2\nmsg.uid = uid[1]\n// flow.set(\"newdata\", \"\") //clear\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 300,
+        "wires": [
+            [
+                "e5417270ac89d5d2"
+            ]
+        ]
+    },
+    {
+        "id": "e5417270ac89d5d2",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "debug 839",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "e99402bee74f4973",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataProsperPlus.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1100,
+        "y": 400,
+        "wires": [
+            [
+                "4db136d50177070c"
+            ]
+        ]
+    },
+    {
+        "id": "4db136d50177070c",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataProsperPlus.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1260,
+        "y": 400,
+        "wires": [
+            [
+                "65ff79f1559a35f2"
+            ]
+        ]
+    },
+    {
+        "id": "65ff79f1559a35f2",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "debug \" \"",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1420,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "f04322cbba1f6961",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"pvpXwaOLhcMKTuQGLyB\"\nvar dataPplus = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdata' + uid)\nmsg.payload = dataPplus\nflow.set(\"newdata\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 400,
+        "wires": [
+            [
+                "e99402bee74f4973"
+            ]
+        ]
+    },
+    {
+        "id": "2913c2d8c31643af",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "18000",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 770,
+        "y": 400,
+        "wires": [
+            [
+                "f04322cbba1f6961"
+            ]
+        ]
+    },
+    {
+        "id": "4132a61e1a709fce",
+        "type": "comment",
+        "z": "cfe215a1ee91cf68",
+        "name": "Prosper+",
+        "info": "",
+        "x": 140,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "b2ab16fe32b8f559",
+        "type": "mqtt in",
+        "z": "cfe215a1ee91cf68",
+        "name": "+",
+        "topic": "devices/+/messages/events/",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "71613f2d25149c73",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 400,
+        "wires": [
+            [
+                "b20fbef09879b3c9"
+            ]
+        ]
+    },
+    {
+        "id": "3391d96b35e1d106",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "debug 919",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "b20fbef09879b3c9",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "setProsper+",
+        "func": "var uid = msg.topic.split(\"/\");\nvar data = msg.payload;\nvar timestamp = Date.now();\n\n// ดึงข้อมูลเวลาที่บันทึกล่าสุดสำหรับ uid ที่ระบุ\nvar lastSavedTimestamp = flow.get('lastSavedTimestamp' + uid[1]);\n// Check if 2 minutes have passed since the last save\nif (!lastSavedTimestamp || (timestamp - lastSavedTimestamp) >= 120000 || (data[1] != 12 || data[1] != 2)) {\n    const date = new Date(timestamp + (7 * 60 * 60 * 1000));\n    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;\n\n    var strdata = formattedDate + \",\" + //Datetimes\n        data[0] + \",\" +  //HeadCode:\n        data[1] + \",\" + //SendOrder:\n        ((data[3] << 8) + data[2]) + \",\" +    //Voltage:\n        ((data[5] << 8) + data[4]) + \",\" +    //Current:\n        ((data[7] << 8) + data[6]) + \",\" +    //Power:\n        ((data[9] << 8) + data[8]) + \",\" +    //Days:\n        data[10] + \",\" +    //LeakageCurrent: \n        data[11] + \",\" +    //PowerFactor: \n        data[12] + \",\" +    //ONOFF: \n        data[13] + \",\" +    //FaultStuation: \n        data[14] + \",\" +    //LeakageSetValue:\n        data[15] + \",\" +    //RateOfCurrentSetValue: \n        ((data[17] << 8) + data[16]) + \",\" +  //UnderVoltSet:\n        ((data[19] << 8) + data[18]) + \",\" +  //OverVoltageSet: \n        data[20] + \",\" +    //TripSelectBit: \n        data[21] + \",\" +    //Lern_Flag: \n        data[22] + \",\" +    //Carrent_Offset: \n        data[23] + \",\" +    //WaveStyle1: \n        data[24] + \",\" +    //WaveStyle2: \n        data[25] + \",\" +    //\"LearnWaveCode1\": \n        data[26] + \",\" +    //LearnWaveCode2: \n        data[27] + \",\" +    //LearnWaveCode3:\n        data[28] + \",\" +    //LearnWaveCode4: \n        data[29] + \",\" +    //HF: \n        data[30] + \",\" +    //SoftwareCode: \n        data[31] + \",\" +    //ArcCode: \n        data[32] + \",\" +    //Temperature: \n        ((data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33]) + \",\" +  //MacAddress: \n        ((data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39]) + \",\" +    //Dumy: \n        ((data[55] << 8) + data[54]) + \",\" +  //Years: \n        data[56] + \",\" +    //Month: \n        data[57] + \",\" +    //Day: \n        data[58] + \",\" +    //Hours: \n        data[59] + \",\" +    //Minutes: \n        data[60] + \",\" +    // Seconds: \n        data[61] + \",\" +    //WeekDay: \n        ((data[63] << 8) + data[62])\n\n    var data1 = flow.get('newdata' + uid[1]);\n    var data2 = strdata + \"\\n\" + data1;\n    flow.set(\"newdata\" + uid[1], data2);\n    // บันทึกเวลาที่ใช้ล่าสุด\n    flow.set('lastSavedTimestamp' + uid[1], timestamp);\n}\n// msg.payload = flow.get('newdata' + uid[1]);\nmsg.payload = data2;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 400,
+        "wires": [
+            [
+                "3391d96b35e1d106"
+            ]
+        ]
+    },
+    {
+        "id": "27b269e4f00871e7",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"795302e47df64c33a15\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 540,
+        "wires": [
+            [
+                "6dcc1286b75c9ee3"
+            ]
+        ]
+    },
+    {
+        "id": "6dcc1286b75c9ee3",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN148.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 540,
+        "wires": [
+            [
+                "b1d72557d7094753"
+            ]
+        ]
+    },
+    {
+        "id": "0d7fafa08c091757",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "Kevin Cook1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1670,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "b1d72557d7094753",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN148.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 540,
+        "wires": [
+            [
+                "0d7fafa08c091757"
+            ]
+        ]
+    },
+    {
+        "id": "bbc4527ffa2f2b8b",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"cbe5201e4dc048ec947\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 600,
+        "wires": [
+            [
+                "64261299a73d6842"
+            ]
+        ]
+    },
+    {
+        "id": "64261299a73d6842",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN51.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 600,
+        "wires": [
+            [
+                "e0cfc23bf0e23759"
+            ]
+        ]
+    },
+    {
+        "id": "384d4be37388d780",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "Kevin Cook2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1670,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "e0cfc23bf0e23759",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN51.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 600,
+        "wires": [
+            [
+                "384d4be37388d780"
+            ]
+        ]
+    },
+    {
+        "id": "20b5ca91c54c5f75",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "Guillaume Verbal",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1690,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "4a2c6baedf0d6810",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN145.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 660,
+        "wires": [
+            [
+                "20b5ca91c54c5f75"
+            ]
+        ]
+    },
+    {
+        "id": "0aec9cf97e5f5930",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"cddb3c670e0d490db82\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 720,
+        "wires": [
+            [
+                "58d1634ededf401a"
+            ]
+        ]
+    },
+    {
+        "id": "58d1634ededf401a",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN107.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 720,
+        "wires": [
+            [
+                "5e33a75c942c9213"
+            ]
+        ]
+    },
+    {
+        "id": "2d4a0fedc3082584",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "เจษฎาวัฒน์ เพรียบจริยวัฒน์",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1710,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "5e33a75c942c9213",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN107.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 720,
+        "wires": [
+            [
+                "2d4a0fedc3082584"
+            ]
+        ]
+    },
+    {
+        "id": "3c45cdbb474f80c3",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"c5fb90bd66fe457aaa1\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 780,
+        "wires": [
+            [
+                "205aa2635f181a37"
+            ]
+        ]
+    },
+    {
+        "id": "205aa2635f181a37",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN115.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 780,
+        "wires": [
+            [
+                "a8592d0841f54764"
+            ]
+        ]
+    },
+    {
+        "id": "f9905e74c979449e",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "คุณประวีร์",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1660,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "a8592d0841f54764",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN115.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 780,
+        "wires": [
+            [
+                "f9905e74c979449e"
+            ]
+        ]
+    },
+    {
+        "id": "1fb76297c3912742",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"17a3d4bd03484f57a1f\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 840,
+        "wires": [
+            [
+                "b5115705efecdc07"
+            ]
+        ]
+    },
+    {
+        "id": "b5115705efecdc07",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN147.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 840,
+        "wires": [
+            [
+                "81f81ab28f9dd1fc"
+            ]
+        ]
+    },
+    {
+        "id": "9fbb376c3a84e53d",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "คุณหมอสุพรชัย กองพัฒนากุล",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1720,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "81f81ab28f9dd1fc",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN147.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 840,
+        "wires": [
+            [
+                "9fbb376c3a84e53d"
+            ]
+        ]
+    },
+    {
+        "id": "b5c35a3be00139e7",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"ffa026de448142adaab\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 900,
+        "wires": [
+            [
+                "0eb703174c8d3730"
+            ]
+        ]
+    },
+    {
+        "id": "0eb703174c8d3730",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN29.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 900,
+        "wires": [
+            [
+                "d0715ad7fc773a6f"
+            ]
+        ]
+    },
+    {
+        "id": "bc1668d35b5e8929",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "Bajaj Ishmit",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1670,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "d0715ad7fc773a6f",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN29.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 900,
+        "wires": [
+            [
+                "bc1668d35b5e8929"
+            ]
+        ]
+    },
+    {
+        "id": "eb21a8e5e2e4a75f",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"919d1abfdfd14146a27\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 960,
+        "wires": [
+            [
+                "b414d6966fe1256b"
+            ]
+        ]
+    },
+    {
+        "id": "b414d6966fe1256b",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN146.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 960,
+        "wires": [
+            [
+                "65335ef9e0f9e38c"
+            ]
+        ]
+    },
+    {
+        "id": "76a4627853d6a8a7",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "Gopal Jagota",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1670,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "65335ef9e0f9e38c",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN146.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 960,
+        "wires": [
+            [
+                "76a4627853d6a8a7"
+            ]
+        ]
+    },
+    {
+        "id": "5fbad11db59203ca",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"91a3e26b4cde46e3be7\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 1020,
+        "wires": [
+            [
+                "5ea538d14823dbc9"
+            ]
+        ]
+    },
+    {
+        "id": "5ea538d14823dbc9",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN142.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 1020,
+        "wires": [
+            [
+                "988d1be3ceafd227"
+            ]
+        ]
+    },
+    {
+        "id": "116b7555b591f7d6",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "คุณปราณี ศิริกัญญาณี",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1690,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "988d1be3ceafd227",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN142.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 1020,
+        "wires": [
+            [
+                "116b7555b591f7d6"
+            ]
+        ]
+    },
+    {
+        "id": "fbd658426a3a9d24",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"89db08435a4d43aaa24\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 1080,
+        "wires": [
+            [
+                "7e564cf77fd5da15"
+            ]
+        ]
+    },
+    {
+        "id": "7e564cf77fd5da15",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN150.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 1080,
+        "wires": [
+            [
+                "33513e03fd0fc03f"
+            ]
+        ]
+    },
+    {
+        "id": "af2e1ec9342ece94",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "Kishor Rana",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1670,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "33513e03fd0fc03f",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN150.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 1080,
+        "wires": [
+            [
+                "af2e1ec9342ece94"
+            ]
+        ]
+    },
+    {
+        "id": "60f49eee3027066a",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"8d94c8b3b0ac4620910\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 1140,
+        "wires": [
+            [
+                "bc61cd9a503e85e1"
+            ]
+        ]
+    },
+    {
+        "id": "bc61cd9a503e85e1",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN48.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 1140,
+        "wires": [
+            [
+                "2aa4a1f411656503"
+            ]
+        ]
+    },
+    {
+        "id": "2fbc6378e0225964",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "คุณมงคล สนองศรียุคล",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1700,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "2aa4a1f411656503",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN48.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 1140,
+        "wires": [
+            [
+                "2fbc6378e0225964"
+            ]
+        ]
+    },
+    {
+        "id": "920e03b989e5466b",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"0524d73061e04ba794d\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 1200,
+        "wires": [
+            [
+                "b5b7118b951497b8"
+            ]
+        ]
+    },
+    {
+        "id": "b5b7118b951497b8",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN73.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 1200,
+        "wires": [
+            [
+                "cd1c716e62aaa803"
+            ]
+        ]
+    },
+    {
+        "id": "98e0eff7643f27dd",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "ENZO RULLI",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1670,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "cd1c716e62aaa803",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN73.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 1200,
+        "wires": [
+            [
+                "98e0eff7643f27dd"
+            ]
+        ]
+    },
+    {
+        "id": "1c565e2e7baca716",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"844045b75cf7466e92d\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 1260,
+        "wires": [
+            [
+                "b004c9319493dea1"
+            ]
+        ]
+    },
+    {
+        "id": "b004c9319493dea1",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN88.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 1260,
+        "wires": [
+            [
+                "32bfd88aa123ea7e"
+            ]
+        ]
+    },
+    {
+        "id": "37204290f75f805c",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "Klaus Juergen Feilkas",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1700,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "32bfd88aa123ea7e",
+        "type": "file in",
+        "z": "cfe215a1ee91cf68",
+        "name": "read data",
+        "filename": "DataMLN88.csv",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 1440,
+        "y": 1260,
+        "wires": [
+            [
+                "37204290f75f805c"
+            ]
+        ]
+    },
+    {
+        "id": "c6017c9a9460ddf9",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 540,
+        "wires": [
+            [
+                "27b269e4f00871e7"
+            ]
+        ]
+    },
+    {
+        "id": "70214f396f78401d",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 600,
+        "wires": [
+            [
+                "bbc4527ffa2f2b8b"
+            ]
+        ]
+    },
+    {
+        "id": "580d4c419bd8bda5",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 720,
+        "wires": [
+            [
+                "0aec9cf97e5f5930"
+            ]
+        ]
+    },
+    {
+        "id": "6d773598a4b41996",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 780,
+        "wires": [
+            [
+                "3c45cdbb474f80c3"
+            ]
+        ]
+    },
+    {
+        "id": "bdd65e6d964e701d",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 840,
+        "wires": [
+            [
+                "1fb76297c3912742"
+            ]
+        ]
+    },
+    {
+        "id": "206b198adff746b6",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 900,
+        "wires": [
+            [
+                "b5c35a3be00139e7"
+            ]
+        ]
+    },
+    {
+        "id": "0f2aa018a6710ae0",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 960,
+        "wires": [
+            [
+                "eb21a8e5e2e4a75f"
+            ]
+        ]
+    },
+    {
+        "id": "957cf65c46ec0a96",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 1020,
+        "wires": [
+            [
+                "5fbad11db59203ca"
+            ]
+        ]
+    },
+    {
+        "id": "817a6469d393289a",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 1080,
+        "wires": [
+            [
+                "fbd658426a3a9d24"
+            ]
+        ]
+    },
+    {
+        "id": "13d9b67e868d72f4",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 1140,
+        "wires": [
+            [
+                "60f49eee3027066a"
+            ]
+        ]
+    },
+    {
+        "id": "03d9433f83f6e23b",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 1200,
+        "wires": [
+            [
+                "920e03b989e5466b"
+            ]
+        ]
+    },
+    {
+        "id": "10e4a83d6c769be6",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 1260,
+        "wires": [
+            [
+                "1c565e2e7baca716"
+            ]
+        ]
+    },
+    {
+        "id": "f6cb7e8e3cf90bbf",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "getnewdata",
+        "func": "var uid = \"ecbaa46876bc4ffc97f\"\nvar dataMLN = \"DateTimes,HeadCode, SendOrder, Voltage, Current, Power, Days, LeakageCurrent, PowerFactor, ONOFF, FaultStuation, LeakageSetValue, RateOfCurrentSetValue, UnderVoltSet, OverVoltageSet, TripSelectBit, Lern_Flag, Carrent_Offset, WaveStyle1, WaveStyle2, LearnWaveCode1,LearnWaveCode2, LearnWaveCode3, LearnWaveCode4, HF, SoftwareCode, ArcCode, Temperature, MacAddress, Dumy, Years, Month, Day, Hours, Minutes, Seconds, WeekDay, UploadCount \" + \"\\n\" + flow.get('newdataMLN' + uid)\nmsg.payload = dataMLN\nflow.set(\"newdataMLN\" + uid, \"\")\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 660,
+        "wires": [
+            [
+                "807cbbef328481cb"
+            ]
+        ]
+    },
+    {
+        "id": "807cbbef328481cb",
+        "type": "file",
+        "z": "cfe215a1ee91cf68",
+        "name": "write data",
+        "filename": "DataMLN145.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 660,
+        "wires": [
+            [
+                "4a2c6baedf0d6810"
+            ]
+        ]
+    },
+    {
+        "id": "5d7bb95667c3dd91",
+        "type": "inject",
+        "z": "cfe215a1ee91cf68",
+        "name": "to get",
+        "props": [],
+        "repeat": "21600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 830,
+        "y": 660,
+        "wires": [
+            [
+                "f6cb7e8e3cf90bbf"
+            ]
+        ]
+    },
+    {
+        "id": "dd4960c0b5d52059",
+        "type": "mqtt in",
+        "z": "cfe215a1ee91cf68",
+        "name": "+",
+        "topic": "devices/+/messages/events/",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "101ccc78c7342c89",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 540,
+        "wires": [
+            [
+                "f674c4cf38e8f19c"
+            ]
+        ]
+    },
+    {
+        "id": "f674c4cf38e8f19c",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "setdataMillennium",
+        "func": "var uid = msg.topic.split(\"/\");\nvar data = msg.payload;\nvar timestamp = Date.now();\n\n// ดึงข้อมูลเวลาที่บันทึกล่าสุดสำหรับ uid ที่ระบุ\nvar lastSavedTimestamp = flow.get('lastSavedTimestamp' + uid[1]);\n// Check if 2 minutes have passed since the last save\nif (!lastSavedTimestamp || (timestamp - lastSavedTimestamp) >= 120000 || (data[1] != 12 || data[1] != 2)) {\n    const date = new Date(timestamp + (7 * 60 * 60 * 1000));\n    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;\n\n    var strdata = formattedDate + \",\" + //Datetimes\n        data[0] + \",\" +  //HeadCode:\n        data[1] + \",\" + //SendOrder:\n        ((data[3] << 8) + data[2]) + \",\" +    //Voltage:\n        ((data[5] << 8) + data[4]) + \",\" +    //Current:\n        ((data[7] << 8) + data[6]) + \",\" +    //Power:\n        ((data[9] << 8) + data[8]) + \",\" +    //Days:\n        data[10] + \",\" +    //LeakageCurrent: \n        data[11] + \",\" +    //PowerFactor: \n        data[12] + \",\" +    //ONOFF: \n        data[13] + \",\" +    //FaultStuation: \n        data[14] + \",\" +    //LeakageSetValue:\n        data[15] + \",\" +    //RateOfCurrentSetValue: \n        ((data[17] << 8) + data[16]) + \",\" +  //UnderVoltSet:\n        ((data[19] << 8) + data[18]) + \",\" +  //OverVoltageSet: \n        data[20] + \",\" +    //TripSelectBit: \n        data[21] + \",\" +    //Lern_Flag: \n        data[22] + \",\" +    //Carrent_Offset: \n        data[23] + \",\" +    //WaveStyle1: \n        data[24] + \",\" +    //WaveStyle2: \n        data[25] + \",\" +    //\"LearnWaveCode1\": \n        data[26] + \",\" +    //LearnWaveCode2: \n        data[27] + \",\" +    //LearnWaveCode3:\n        data[28] + \",\" +    //LearnWaveCode4: \n        data[29] + \",\" +    //HF: \n        data[30] + \",\" +    //SoftwareCode: \n        data[31] + \",\" +    //ArcCode: \n        data[32] + \",\" +    //Temperature: \n        ((data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33]) + \",\" +  //MacAddress: \n        ((data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39]) + \",\" +    //Dumy: \n        ((data[55] << 8) + data[54]) + \",\" +  //Years: \n        data[56] + \",\" +    //Month: \n        data[57] + \",\" +    //Day: \n        data[58] + \",\" +    //Hours: \n        data[59] + \",\" +    //Minutes: \n        data[60] + \",\" +    // Seconds: \n        data[61] + \",\" +    //WeekDay: \n        ((data[63] << 8) + data[62])\n\n    var data1 = flow.get('newdataMLN' + uid[1]);\n    var data2 = strdata + \"\\n\" + data1 ;\n    flow.set(\"newdataMLN\" + uid[1], data2);\n    // บันทึกเวลาที่ใช้ล่าสุด\n    flow.set('lastSavedTimestamp' + uid[1], timestamp);\n}\n// msg.payload = flow.get('newdataMLN' + uid[1]);\nmsg.payload = data2;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 540,
+        "wires": [
+            [
+                "9a851a4924d6fe4a"
+            ]
+        ]
+    },
+    {
+        "id": "9a851a4924d6fe4a",
+        "type": "debug",
+        "z": "cfe215a1ee91cf68",
+        "name": "debug 992",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "a29b5ae81a278c90",
+        "type": "mqtt in",
+        "z": "cfe215a1ee91cf68",
+        "name": "+",
+        "topic": "devices/+/messages/events/",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "59743d41bdb510f2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "c50609b5bf88e4d1"
+            ]
+        ]
+    },
+    {
+        "id": "c50609b5bf88e4d1",
+        "type": "function",
+        "z": "cfe215a1ee91cf68",
+        "name": "phase_check",
+        "func": "var uid = msg.topic.split(\"/\");\nvar database = [{\n    uuid: '80d3294bcd1741af803',\n    phase: 1\n}, {\n    uuid: '2f8faf73580c4a18915',\n    phase: 1\n}, {\n    uuid: '2d25e3f0282b44da97e',\n    phase: 3\n}, {\n    uuid: 'e71360b485424206ae8',\n    phase: 3\n}];\n\nfor (var i = 0; i < database.length; i++) {\n    if (uid[1] == database[i].uuid) {\n       // msg = { phase_check: database[i].phase };\n        msg.phase_check = database[i].phase;\n    }   \n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 100,
+        "wires": [
+            [
+                "075f8b1110575a86"
+            ]
+        ]
+    },
+    {
+        "id": "075f8b1110575a86",
+        "type": "switch",
+        "z": "cfe215a1ee91cf68",
+        "name": "",
+        "property": "phase_check",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "3",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 100,
+        "wires": [
+            [
+                "5435b94731b79b90",
+                "81af8fc6e56dbbb6"
+            ],
+            [
+                "0f96389868d9025a",
+                "81ca7a98171fd34d"
+            ]
+        ]
+    },
+    {
+        "id": "71613f2d25149c73",
+        "type": "mqtt-broker",
+        "name": "Prosper+",
+        "broker": "mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "101ccc78c7342c89",
+        "type": "mqtt-broker",
+        "name": "Millennium",
+        "broker": "http://mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "59743d41bdb510f2",
+        "type": "mqtt-broker",
+        "name": "Prosper",
+        "broker": "mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "120",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "915e4c972e245169",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-email": "3.1.0"
+        }
+    }
+]

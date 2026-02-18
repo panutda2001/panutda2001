@@ -1,0 +1,748 @@
+[
+    {
+        "id": "11d78599e139c01b",
+        "type": "tab",
+        "label": "SINGAPORE",
+        "disabled": true,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "457e656e503938d7",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "function 31",
+        "func": "var data = msg.payload;\nmsg.payload = {\n    HeadCode: data[0],\n    SendOrder: data[1],\n    Voltage: data[2] + data[3],\n    Current: data[4] + data[5],\n    Power: data[6] + data[7],\n    Days: data[8] + data[9],\n    LeakageCurrent: data[10],\n    PowerFactor: data[11],\n    ONOFF: data[12],\n    FaultStuation: data[13],\n    LeakageSetValue: data[14],\n    RateOfCurrentSetValue: data[15],\n    UnderVoltSet: (data[17] << 8) + data[16],\n    OverVoltageSet: (data[19] << 8) + data[18],\n    TripSelectBit: data[20],\n    Lern_Flag: data[21],\n    Carrent_Offset: data[22],\n    WaveStyle1: data[23],\n    WaveStyle2: data[24],\n    LearnWaveCode1: data[25],\n    LearnWaveCode2: data[26],\n    LearnWaveCode3: data[27],\n    LearnWaveCode4: data[28],\n    HF: data[29],\n    SoftwareCode: data[30],\n    ArcCode: data[31],\n    Temperature: data[32],\n    MacAddress: (data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33],\n    Dumy: (data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39],\n    Years: (data[55] << 8) + data[54],\n    Month: data[56],\n    Day: data[57],\n    Hours: data[58],\n    Minutes: data[59],\n    Seconds: data[60],\n    WeekDay: data[61],\n    UploadCount: (data[63] << 8) + data[62],\n    \n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 140,
+        "wires": [
+            [
+                "0958805567aa7d99"
+            ]
+        ]
+    },
+    {
+        "id": "0958805567aa7d99",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "Station1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "5f05a6007c93463d",
+        "type": "comment",
+        "z": "11d78599e139c01b",
+        "name": "SINGAPORE new ver. Notify ON/OFF",
+        "info": "",
+        "x": 1050,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "363d0531926f4638",
+        "type": "comment",
+        "z": "11d78599e139c01b",
+        "name": "LOG DATA SINGAPORE",
+        "info": "",
+        "x": 170,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "c8e0f4b306d541ab",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "setdataSG1",
+        "func": "var data = msg.payload;\nvar timestamp = Date.now()\nconst date = new Date(timestamp);\nconst formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;\n\nmsg.payload =\n    formattedDate + \"   \" +  //Datetimes\n    data[20] + \"\"     //TripSelectBit: \n    \n\nflow.set('dataH', msg.payload);\nmsg.topic = flow.get('dataH')\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "476d73d91129a335"
+            ]
+        ]
+    },
+    {
+        "id": "476d73d91129a335",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 634",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "535826f1068afc7d",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "setup ",
+        "func": "var uid = msg.uid;\nvar data = Array(32);\n\ndata[0] = 100;\ndata[1] = 3;\ndata[20] = 0b01111111;\n//data[20]    = 0b0000000;\n\n//present value\ndata[14] = 100;                     //  Leakage set value\ndata[15] = 30;                      //  rate of Current set vlaue \ndata[16] = 180;                     //  Under voltage set\ndata[17] = 0;\ndata[18] = 15;                     //  Over voltage set\ndata[19] = 1;\ndata[21] = 0;                      //  learn_flag \ndata[29] = 103;                    //  voltage offset\ndata[22] = 108;                   //  current offset\ndata[31] = msg.phase;            //  current offset\n\n\n\nconst buffer = Buffer.from(data);\nmsg.topic = \"devices/\" + uid + \"/messages/devicebound/\"\nmsg.payload = buffer;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 440,
+        "wires": [
+            [
+                "4f050bd809b40d5d",
+                "a6717f105261f75e"
+            ]
+        ]
+    },
+    {
+        "id": "c7897427660c04f5",
+        "type": "inject",
+        "z": "11d78599e139c01b",
+        "name": "uuid-S1",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "uid",
+                "v": "7159e6ab27c14f6ba79",
+                "vt": "str"
+            },
+            {
+                "p": "phase",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 440,
+        "wires": [
+            [
+                "535826f1068afc7d"
+            ]
+        ]
+    },
+    {
+        "id": "4f050bd809b40d5d",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 637",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "82abe89b1fb71051",
+        "type": "comment",
+        "z": "11d78599e139c01b",
+        "name": "SETUP 1 PHASE",
+        "info": "",
+        "x": 140,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "0ba9bf7d35fd4181",
+        "type": "comment",
+        "z": "11d78599e139c01b",
+        "name": "M5",
+        "info": "",
+        "x": 950,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "8deaa040bf2da64d",
+        "type": "mqtt in",
+        "z": "11d78599e139c01b",
+        "name": "SINGAPOREM5",
+        "topic": "channel/+/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "93ca48dc95cabfe3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 980,
+        "y": 500,
+        "wires": [
+            [
+                "f5a115cc07aa5e72"
+            ]
+        ]
+    },
+    {
+        "id": "d5251cb7f9123f8b",
+        "type": "switch",
+        "z": "11d78599e139c01b",
+        "name": "",
+        "property": "check_send_noti",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1330,
+        "y": 120,
+        "wires": [
+            [
+                "fc0d80f9979e6d16",
+                "bb45c5f32611fe94"
+            ]
+        ]
+    },
+    {
+        "id": "877f50f3255e71c4",
+        "type": "mqtt in",
+        "z": "11d78599e139c01b",
+        "name": "Singapore",
+        "topic": "devices/+/messages/events/",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "93ca48dc95cabfe3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 880,
+        "y": 140,
+        "wires": [
+            [
+                "560d114c18a92817",
+                "562f18c7f297896c"
+            ]
+        ]
+    },
+    {
+        "id": "560d114c18a92817",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "check error",
+        "func": "msg.headers = {\n    'content-type': 'application/x-www-form-urlencoded',\n    //token from Line...\n    // 'Authorization': 'Bearer U6TIeSMIOEwXv6iXl41RuA5Gl69PBaTjYjOziF2aoyo'\n    //token from Line group\n    'Authorization': 'Bearer TfNQ5HZfHgaEqmjD3EgNVayu4mdJFRvERcLFIzDP6cV'\n};\nvar uid = msg.topic.split(\"/\"); // แยกข้อมูลที่ได้จาก msg.topic ด้วยเครื่องหมาย \"/\"\nvar uidKey = 'CHK_uidSG' + uid[1] + \".timestamp\";\nvar nameuser = [\n    {\n        name: \"station1\",\n        uuid: \"dbb75a17b6324383821\",\n        link: \"https://drive.google.com/drive/folders/1O3L-J1fH0PwQjkChYS-xCPuxb-G-DL8n?usp=drive_link\"\n    }, {\n        name: \"station2\",\n        uuid: \"a7c2248d9694456686e\",\n        link: \"https://drive.google.com/drive/folders/1MC3m9FqGpMKncieFzwtH6Rnzb9ZzbntX?usp=drive_link\"\n    }\n    // , {\n    //     name: \"station3\",\n    //     uuid: \"8469816a5eb94ce59f9\"\n    // }\n];\n\nfunction show_name(uuid) {\n    for (var i = 0; i < nameuser.length; i++) {\n        if (uuid == nameuser[i].uuid) {\n            return nameuser[i].name;\n        }\n    }\n    return \"\";\n}\n// ฟังก์ชันเพื่อค้นหา link\nfunction show_link(uuid) {\n    for (var i = 0; i < nameuser.length; i++) {\n        if (uuid == nameuser[i].uuid) {\n            return nameuser[i].link || \"N/A\"; // หาก link ไม่มีค่า ให้แสดงเป็น \"N/A\"\n        }\n    }\n    return \"N/A\";\n}\n\n// ตรวจสอบข้อผิดพลาด\nvar data = msg.payload;\nvar error_text = \"\"; // ตัวแปรสำหรับเก็บข้อความของข้อผิดพลาด\nvar time_now = Date.now();\nvar lasttime_error = flow.get(uidKey);\nif (!lasttime_error) {\n    lasttime_error = 0;\n}\nvar text_line = \"\";\nmsg.check_send_noti = 0;\n\n// ตรวจสอบข้อมูลที่อยู่ใน nameuser เท่านั้น\nvar isValidUUID = nameuser.some(function (item) {\n    return item.uuid === uid[1];\n});\n\n\n\n// ตรวจสอบว่าข้อมูล data[13] ไม่เท่ากับ 0 และเวลาผ่านไปหลังจากข้อผิดพลาดครั้งก่อนหน้ามากกว่าหรือเท่ากับ 10 นาที หรือไม่มีเวลาของข้อผิดพลาดก่อนหน้า ให้ทำการส่งข้อความ\nif (isValidUUID && data[13] != 0 && (time_now - lasttime_error >= 10 * 60 * 1000)) {\n    if (data[0] == 100 && (data[1] != 61 && data[1] != 62 && data[1] != 63)) {\n        if (data[13] == 1) {\n            error_text = \"ARC\";\n        } else if (data[13] == 2) {\n            error_text = \"LEAKAGE CURRENT\";\n        } else if (data[13] == 4) {\n            error_text = \"UNDER VOLTAGE\";\n        } else if (data[13] == 8) {\n            error_text = \"OVER VOLTAGE\";\n        } else if (data[13] == 16) {\n            error_text = \"OVER CURRENT\";\n        } else if (data[13] == 32) {\n            error_text = \"SHORT CIRCUIT\";\n        } else if (data[13] == 64) {\n            error_text = \"OVER TEMP\";\n        } else if (data[13] == 128) {\n            error_text = \"EQ\";\n        } else if (data[0] == 100 && data[13] == 67) {\n            error_text = \"Send Order Arc Alarm\";\n        } else if (data[0] == 100 && data[13] == 64) {\n            error_text = \"Send Order OC Alarm\";\n        } else if (data[0] == 100 && data[13] == 65) {\n            error_text = \"Send Order SC Alarm\";\n        } else if (data[0] == 100 && data[13] == 14) {\n            error_text = \"Fault trip : \" + data[13] + \" , \" + data[14];\n        }\n        \n        if (error_text !== \"\" && data[1] != 67) {\n            // สร้างข้อความแจ้งเตือน\n            text_line = \"Fault Situation at \" + \"\\nUID : \" + uid[1] + \"\\nPROJECT : SINGAPORE\\nNAME : \" + show_name(uid[1]) + \"\\nError : \" + error_text + \"\\nLINK : \" + show_link(uid[1]);\n            msg.check_send_noti = 1;\n            //datalog\n            var datalog = {}\n            datalog.uid = uid[1]\n            datalog.project = \"SINGAPORE\"\n            datalog.name = show_name(uid[1])\n            datalog.error = error_text\n            msg.datalog = datalog\n            // ส่งข้อความ text_line\n            msg.payload = { \"message\": text_line };\n            flow.set(uidKey, Date.now());\n        }\n    }\n}\n\nmsg.test1 = time_now;\nmsg.test2 = lasttime_error;\nmsg.test3 = time_now - lasttime_error\nmsg.data = data[13];\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 120,
+        "wires": [
+            [
+                "d5251cb7f9123f8b"
+            ]
+        ]
+    },
+    {
+        "id": "8d10f18ccdc95dd9",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 638",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1850,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "bb45c5f32611fe94",
+        "type": "http request",
+        "z": "11d78599e139c01b",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://notify-api.line.me/api/notify",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1670,
+        "y": 160,
+        "wires": [
+            [
+                "8d10f18ccdc95dd9"
+            ]
+        ]
+    },
+    {
+        "id": "fc0d80f9979e6d16",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 639",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1490,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "562f18c7f297896c",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "setSingapore",
+        "func": "var uid = msg.topic.split(\"/\");\nflow.set('uidSG' + uid[1] + \".timestamp\", Date.now());\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 160,
+        "wires": [
+            [
+                "6921992d9cad020a"
+            ]
+        ]
+    },
+    {
+        "id": "6921992d9cad020a",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 640",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "fc4dd4f875d3ca73",
+        "type": "inject",
+        "z": "11d78599e139c01b",
+        "name": "to get",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 890,
+        "y": 200,
+        "wires": [
+            [
+                "844a6f26b366afa7"
+            ]
+        ]
+    },
+    {
+        "id": "679ea02f9e05aaa2",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 641",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "f266fa2dc228a682",
+        "type": "inject",
+        "z": "11d78599e139c01b",
+        "name": "to get",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "test",
+                "v": "1111111111111111111111111111111111111",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 950,
+        "y": 560,
+        "wires": [
+            [
+                "b09b9838ae46fe7e"
+            ]
+        ]
+    },
+    {
+        "id": "52a3ebdf3c444d4f",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 642",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1410,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "b09b9838ae46fe7e",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "getdataSGM5",
+        "func": "msg.headers = {\n    'content-type': 'application/x-www-form-urlencoded',\n    //token from Line...\n    'Authorization': 'Bearer DPerRd6vt3DbNIzSkYC3ViK0lcvOavWeOPojz62i3Ao'\n    //token from Line group\n    //  'Authorization': 'Bearer TfNQ5HZfHgaEqmjD3EgNVayu4mdJFRvERcLFIzDP6cV'\n};\nvar datalogHOME = flow.get('dataSGM5')\nmsg.payload = datalogHOME\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1200,
+        "y": 560,
+        "wires": [
+            [
+                "52a3ebdf3c444d4f",
+                "cbce96bfdf54c4c9"
+            ]
+        ]
+    },
+    {
+        "id": "142b809f6bf9e3cf",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 643",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1790,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "cbce96bfdf54c4c9",
+        "type": "http request",
+        "z": "11d78599e139c01b",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://notify-api.line.me/api/notify",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1610,
+        "y": 560,
+        "wires": [
+            [
+                "142b809f6bf9e3cf"
+            ]
+        ]
+    },
+    {
+        "id": "f5a115cc07aa5e72",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "setdataSGM5",
+        "func": "var uid = msg.topic.split(\"/\");\nflow.set('uidSGM5' + uid[1] + \".timestamp\", Date.now());\n// รายชื่อของอุปกรณ์ที่เก็บข้อมูล\nvar database = [\"dbb75a17b6324383821\", \"a7c2248d9694456686e\"];\nvar nameuser = [\"station1\", \"station2\"]\n\n// อาเรย์ที่ใช้เก็บข้อมูลของอุปกรณ์ที่ออฟไลน์\nvar offlineDevices = [];\n\n// อาเรย์ที่ใช้เก็บข้อมูลของอุปกรณ์ที่ออนไลน์\nvar onlineDevices = [];\n\n// เวลาปัจจุบัน\nvar timeNow = Date.now();\n\n// ระยะเวลาที่กำหนดให้อุปกรณ์ถือว่าออฟไลน์ (20 นาที)\nvar offLine = 20 * 60 * 1000;\n\n// ออปเจ็คที่ใช้เก็บเวลาของแต่ละอุปกรณ์\nvar times = {};\n\n// วนลูปตรวจสอบสถานะของแต่ละอุปกรณ์\nfor (let index = 0; index < database.length; index++) {\n    var lastTime = flow.get('uidSGM5' + database[index] + \".timestamp\");\n    times[database[index]] = lastTime;\n\n    if (timeNow - times[database[index]] <= offLine) {\n        // ถ้าอุปกรณ์ออนไลน์\n        onlineDevices.push({\n            project: 'SINGAPORE',\n            uid: database[index],\n            status: 'M5 ONLINE',\n            name: nameuser[index]\n        });\n    } else {\n        // ถ้าอุปกรณ์ออฟไลน์\n        offlineDevices.push({\n            project: 'SINGAPORE',\n            uid: database[index],\n            status: 'M5 OFFLINE',\n            name: nameuser[index]\n        });\n    }\n}\n\n// ข้อความแจ้งเตือน\nvar notificationMessage = \"\";\n\n// ถ้ามีอุปกรณ์ที่ออฟไลน์\nif (offlineDevices.length > 0) {\n    notificationMessage += \"OFFLINE DEVICES!!\\n\";\n    for (let i = 0; i < offlineDevices.length; i++) {\n        notificationMessage += 'PROJECT: ' + offlineDevices[i].project + '\\n' +\n            'UID: ' + offlineDevices[i].uid + '\\n' +\n            'STATUS: ' + offlineDevices[i].status + '\\n' +\n            'NAME: ' + offlineDevices[i].name + '\\n\\n';\n    }\n}\n\n// ถ้ามีอุปกรณ์ที่ออนไลน์\nif (onlineDevices.length > 0) {\n    notificationMessage += \"ONLINE DEVICES \\n\";\n    for (let i = 0; i < onlineDevices.length; i++) {\n        notificationMessage += 'PROJECT: ' + onlineDevices[i].project + '\\n' +\n            'UID: ' + onlineDevices[i].uid + '\\n' +\n            'STATUS: ' + onlineDevices[i].status + '\\n' +\n            'NAME: ' + onlineDevices[i].name + '\\n\\n';\n    }\n}\n\n// ถ้ามีข้อความแจ้งเตือน\nif (notificationMessage !== \"\") {\n    msg.payload = { \"message\": notificationMessage };\n    flow.set('dataSGM5', msg.payload);\n    return msg;\n} ",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1200,
+        "y": 500,
+        "wires": [
+            [
+                "f61a9e546eab935f"
+            ]
+        ]
+    },
+    {
+        "id": "f61a9e546eab935f",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "debug 644",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1410,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "a6af54fc32ed75d0",
+        "type": "mqtt in",
+        "z": "11d78599e139c01b",
+        "name": "dbb75a17b6324383821",
+        "topic": "devices/dbb75a17b6324383821/messages/events/",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "93ca48dc95cabfe3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 140,
+        "wires": [
+            [
+                "457e656e503938d7",
+                "c8e0f4b306d541ab"
+            ]
+        ]
+    },
+    {
+        "id": "a6717f105261f75e",
+        "type": "mqtt out",
+        "z": "11d78599e139c01b",
+        "name": "dbb75a17b6324383821",
+        "topic": "devices/dbb75a17b6324383821/messages/devicebound/",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "93ca48dc95cabfe3",
+        "x": 610,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "f41b6df01580f8f8",
+        "type": "mqtt in",
+        "z": "11d78599e139c01b",
+        "name": "a7c2248d9694456686e",
+        "topic": "devices/a7c2248d9694456686e/messages/events/",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "93ca48dc95cabfe3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 200,
+        "wires": [
+            [
+                "bd088e01565472a2"
+            ]
+        ]
+    },
+    {
+        "id": "bd088e01565472a2",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "function 42",
+        "func": "var data = msg.payload;\nmsg.payload = {\n    HeadCode: data[0],\n    SendOrder: data[1],\n    Voltage: data[2] + data[3],\n    Current: data[4] + data[5],\n    Power: data[6] + data[7],\n    Days: data[8] + data[9],\n    LeakageCurrent: data[10],\n    PowerFactor: data[11],\n    ONOFF: data[12],\n    FaultStuation: data[13],\n    LeakageSetValue: data[14],\n    RateOfCurrentSetValue: data[15],\n    UnderVoltSet: (data[17] << 8) + data[16],\n    OverVoltageSet: (data[19] << 8) + data[18],\n    TripSelectBit: data[20],\n    Lern_Flag: data[21],\n    Carrent_Offset: data[22],\n    WaveStyle1: data[23],\n    WaveStyle2: data[24],\n    LearnWaveCode1: data[25],\n    LearnWaveCode2: data[26],\n    LearnWaveCode3: data[27],\n    LearnWaveCode4: data[28],\n    HF: data[29],\n    SoftwareCode: data[30],\n    ArcCode: data[31],\n    Temperature: data[32],\n    MacAddress: (data[38] << 8) + (data[37] << 8) + (data[36] << 8) + (data[35] << 8) + (data[34] << 8) + data[33],\n    Dumy: (data[53] << 8) + (data[52] << 8) + (data[51] << 8) + (data[50] << 8) + (data[49] << 8) + (data[48] << 8) + (data[47] << 8) + (data[46] << 8) + (data[45] << 8) + (data[44] << 8) + (data[43] << 8) + (data[42] << 8) + (data[41] << 8) + (data[40] << 8) + data[39],\n    Years: (data[55] << 8) + data[54],\n    Month: data[56],\n    Day: data[57],\n    Hours: data[58],\n    Minutes: data[59],\n    Seconds: data[60],\n    WeekDay: data[61],\n    UploadCount: (data[63] << 8) + data[62],\n    \n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 260,
+        "wires": [
+            [
+                "678a1cae698dc5bb"
+            ]
+        ]
+    },
+    {
+        "id": "678a1cae698dc5bb",
+        "type": "debug",
+        "z": "11d78599e139c01b",
+        "name": "Station2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "39e2bb0ab4792d87",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "check OFFLINE",
+        "func": "msg.headers = {\n    'content-type': 'application/x-www-form-urlencoded',\n    //token from Line...\n    'Authorization': 'Bearer U6TIeSMIOEwXv6iXl41RuA5Gl69PBaTjYjOziF2aoyo'\n    //token from Line group\n    //  'Authorization': 'Bearer TfNQ5HZfHgaEqmjD3EgNVayu4mdJFRvERcLFIzDP6cV'\n};\nvar database = [\"dbb75a17b6324383821\", \"a7c2248d9694456686e\"];\nvar nameuser = [\"station1\", \"station2\"]\nvar noti = \"\";\nvar timeNow = Date.now();\nvar offLine = 10 * 60 * 1000;\nvar times = {}\nfor (let index = 0; index < database.length; index++) {\n    var lastTime = flow.get('uidSG' + database[index] + \".timestamp\");\n    times[database[index]] = lastTime\n    if (timeNow - times[database[index]] <= offLine) {    //check online\n        //     noti += 'Project : ' + 'HOME\\n' + \"UID : \" + database[index] + \"\\n\" + \"Status: ONLINE\" + \"\\n\" + \"Name : \" + nameuser[index] + \"\\n\\n\"\n    } else if (timeNow - times[database[index]] > offLine) {\n        noti += 'Project : ' + 'SINGAPORE\\n' + \"UID : \" + database[index] + \"\\n\" + \"Status: OFFLINE\" + \"\\n\" + \"Name : \" + nameuser[index] + \"\\n\"\n    }\n}\nmsg.test1 = times\nmsg.test2 = timeNow;\nmsg.test3 = timeNow - times[\"dbb75a17b6324383821\"];\nmsg.test4 = timeNow - times[\"a7c2248d9694456686e\"];\n\n\n\nif (noti !== \"\") {\n    msg.payload = { \"message\": noti };\n    return msg;\n} \n\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 160,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "844a6f26b366afa7",
+        "type": "function",
+        "z": "11d78599e139c01b",
+        "name": "check OFFLINE",
+        "func": "msg.headers = {\n    'content-type': 'application/x-www-form-urlencoded',\n    //token from Line...\n    // 'Authorization': 'Bearer U6TIeSMIOEwXv6iXl41RuA5Gl69PBaTjYjOziF2aoyo'\n    //token from Line group\n     'Authorization': 'Bearer TfNQ5HZfHgaEqmjD3EgNVayu4mdJFRvERcLFIzDP6cV'\n};\nvar database = [\n    {\n        uuid: \"dbb75a17b6324383821\",\n        name: \"station1\"\n    },\n    {\n        uuid: \"a7c2248d9694456686e\",\n        name: \"station2\"\n    }\n];\nvar noti = \"\";\nvar timeNow = Date.now();\nvar offLine = 10 * 60 * 1000;\nvar times = {};\n\n// ใช้ for loop เพื่อเข้าถึงแต่ละ object ใน database\nfor (let index = 0; index < database.length; index++) {\n    var uuid = database[index].uuid; // ดึง uuid จาก object\n    var name = database[index].name; // ดึง name จาก object\n    var lastTime = flow.get('uidSG' + uuid + \".timestamp\"); // ดึงค่า timestamp จาก flow\n    times[uuid] = lastTime;\n\n    // ตรวจสอบสถานะออนไลน์/ออฟไลน์\n    if (timeNow - lastTime <= offLine) {\n        // noti += 'Project : ' + 'HOME\\n' + \"UID : \" + uuid + \"\\n\" + \"Status: ONLINE\" + \"\\n\" + \"Name : \" + name + \"\\n\\n\";\n    } else {\n        noti += 'Project : ' + 'SINGAPORE \\n' + \"UID : \" + uuid + \"\\n\" + \"Status: OFFLINE\" + \"\\n\" + \"Name : \" + name + \"\\n\";\n    }\n}\n\n// สร้าง output message\nmsg.test1 = times;\nmsg.test2 = timeNow;\nmsg.test3 = timeNow - times[\"dbb75a17b6324383821\"];\nmsg.test4 = timeNow - times[\"a7c2248d9694456686e\"];\n\nif (noti !== \"\") {\n    msg.payload = { \"message\": noti };\n    return msg;\n}\n\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1180,
+        "y": 200,
+        "wires": [
+            [
+                "679ea02f9e05aaa2"
+            ]
+        ]
+    },
+    {
+        "id": "93ca48dc95cabfe3",
+        "type": "mqtt-broker",
+        "name": "SINGAPORE",
+        "broker": "mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "232b3cbe63bc0c17",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "232b3cbe63bc0c17",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "emqxsl-ca(last).crt",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    }
+]
