@@ -1,0 +1,864 @@
+[
+    {
+        "id": "f70e32ad7f2af5b0",
+        "type": "mqtt out",
+        "z": "79676b8bffba8ff3",
+        "name": "",
+        "topic": "",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "940d6bc3dd2d65e0",
+        "x": 890,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "4027e782f58e62b4",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "request n",
+        "func": "var data = Array(32);\ndata[0]  = 100;\ndata[1]  = 1;\n\nconst buffer = Buffer.from(data);\nconst base64String = buffer.toString('base64');\n//msg.payload = base64String;\nmsg.topic = \"devices/\"+msg.uid+\"/messages/devicebound/\"\nmsg.payload = buffer\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 160,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "a1b1cee8f5a63847",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "setup tripbit",
+        "func": "var uid         = msg.uid;\nvar data        = Array(32);\n\ndata[0]     = 100;\ndata[1]     = 3;\n// data[20]    = 0b01111111;\n// data[20]    = 0b0000000;\n// data[20]    = 0b01111110;\n\ndata[20]    = 0b11111111;  \n// 1, arc 2, Leak 3, Under voltage 4, over voltage 5, Over current 6, Short circit 7, Over temp 8, earth q\n\n\n\n//present value\ndata[14] = 50;                     //  Leakage set value\n\n// data[15] = 35;                      //  rate of Current set vlaue \ndata[15] = 5;                      //  rate of Current set vlaue \n\n\ndata[16] = 180;                     //  Under voltage set\ndata[17] = 0; \n\n// data[18] = 14;                      //  Over voltage set\n// data[19] = 1;\ndata[18] = 240;                      //  Over voltage set\ndata[19] = 0;\n\ndata[21] = 0;                       //  learn_flag \ndata[29] =  97;                     //  voltage offset\ndata[22] = 100;                     //  current offset\n\n\ndata[30] = 2;                       //  sensitive ack\ndata[31] = msg.phase;               //  phase\n\n\n\nconst buffer = Buffer.from(data);\nmsg.topic = \"devices/\"+uid+\"/messages/devicebound/\"\nmsg.payload = buffer;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 340,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "e999073b0a2d82fd",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            },
+            {
+                "p": "phase",
+                "v": "3",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 340,
+        "wires": [
+            [
+                "a1b1cee8f5a63847"
+            ]
+        ]
+    },
+    {
+        "id": "e6a51b32862e9e9e",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "32",
+        "payloadType": "num",
+        "x": 350,
+        "y": 540,
+        "wires": [
+            [
+                "6e9f92cf744a8daa"
+            ]
+        ]
+    },
+    {
+        "id": "250dab3ef3ec96a0",
+        "type": "mqtt in",
+        "z": "79676b8bffba8ff3",
+        "name": "",
+        "topic": "devices/1234/messages/+/",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "940d6bc3dd2d65e0",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 290,
+        "y": 120,
+        "wires": [
+            [
+                "4da7ca66a8acb11f"
+            ]
+        ]
+    },
+    {
+        "id": "4da7ca66a8acb11f",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "",
+        "func": "function convertalarm(data){\n    if(data == 1){\n        return \"arc\"\n    } else if(data == 2){\n        return \"leak\"\n    } else if(data == 4){\n        return \"Under V\"\n    } else if(data == 8){\n        return \"Over V\"\n    } else if(data == 16){\n        return \"Over C\"\n    } else if(data == 32){\n        return \"Short Circuit\"\n    } else if(data == 64){\n        return \"Over Temp\"\n    } else if(data == 128){\n        return \"EQ\"\n    } else if(data > 0){\n        return \"ERROR \" + data\n    } else if(data == 0){\n        return \"normal\"\n    }\n}\n\nvar data_rx_buffer = Buffer.from(msg.payload, 'base64');\nmsg.buff = msg.payload;\nmsg.payload = {\n    order:data_rx_buffer[1],\n    volt:(data_rx_buffer[3]<<8) + data_rx_buffer[2],\n    current:((data_rx_buffer[5]<<8) + data_rx_buffer[4])/10,\n    power:((data_rx_buffer[7]<<8) + data_rx_buffer[6])/10,\n    power_factor:data_rx_buffer[11],\n    leak:data_rx_buffer[10],\n    set_leak:data_rx_buffer[14],\n    set_under_voltage:(data_rx_buffer[17]<<8) + data_rx_buffer[16],\n    set_over_voltage:(data_rx_buffer[19]<<8) + data_rx_buffer[18],\n    set_over_current:data_rx_buffer[15],\n    switch:data_rx_buffer[12],\n    address:data_rx_buffer[38],\n    tripbit:data_rx_buffer[20].toString(2).split(\"\"),\n    faultbit:convertalarm(data_rx_buffer[13]),\n    vol_offset:data_rx_buffer[29],\n    current_offset:data_rx_buffer[22],\n    sensitivity:data_rx_buffer[30],\n    phase:data_rx_buffer[31],\n}\nflow.set('raw',data_rx_buffer);\n\nmsg.order_code = data_rx_buffer[1];\n\n// // check save\n// if(data_rx_buffer[1]){\n    \n// }\n\n//msg.payload = data_rx_buffer\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 120,
+        "wires": [
+            [
+                "79b8e173a0c195c4"
+            ]
+        ]
+    },
+    {
+        "id": "79b8e173a0c195c4",
+        "type": "debug",
+        "z": "79676b8bffba8ff3",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "969ccfa248ed41dc",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "enable lost phase TRIPBIT",
+        "func": "var uid         = msg.uid;\nvar data        = Array(32);\n\ndata[0]     = 100;\ndata[1]     = 99;\ndata[2]     = 0;\n\nconst buffer = Buffer.from(data);\nmsg.topic = \"devices/\"+uid+\"/messages/devicebound/\"\nmsg.payload = buffer;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 500,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "5fa7814c177c081c",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 500,
+        "wires": [
+            [
+                "969ccfa248ed41dc"
+            ]
+        ]
+    },
+    {
+        "id": "6e9f92cf744a8daa",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "set up ev current",
+        "func": "msg.topic = \"channel/\"+msg.uid+\"/set_ev_current\"\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 540,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "884a23e5cea5c9cc",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 420,
+        "wires": [
+            [
+                "3a4ded82c5cdc971"
+            ]
+        ]
+    },
+    {
+        "id": "3a4ded82c5cdc971",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "enable leak ac",
+        "func": "var uid         = msg.uid;\nvar data        = Array(32);\n\ndata[0]     = 100;\ndata[1]     = 94;\ndata[2]     = 1;\n\n\nconst buffer = Buffer.from(data);\nmsg.topic = \"devices/\"+uid+\"/messages/devicebound/\"\nmsg.payload = buffer;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 420,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "298b103147b1d44e",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "setup leak tripbit",
+        "func": "var uid         = msg.uid;\nvar data        = Array(32);\n\ndata[0]     = 100;\ndata[1]     = 92;\ndata[2]     = 1;\n\n\nconst buffer = Buffer.from(data);\nmsg.topic = \"devices/\"+uid+\"/messages/devicebound/\"\nmsg.payload = buffer;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 460,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "8447f7ccc6a4fab0",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 460,
+        "wires": [
+            [
+                "298b103147b1d44e"
+            ]
+        ]
+    },
+    {
+        "id": "b77f5b64b66b3e3e",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "setup value leak 3p",
+        "func": "var uid         = msg.uid;\nvar data        = Array(32);\n\ndata[0]     = 100;\ndata[1]     = 91;\ndata[2]     = 50;\n\nconst buffer = Buffer.from(data);\nmsg.topic = \"devices/\"+uid+\"/messages/devicebound/\"\nmsg.payload = buffer;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 380,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "705b5e83ceef9719",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 380,
+        "wires": [
+            [
+                "b77f5b64b66b3e3e"
+            ]
+        ]
+    },
+    {
+        "id": "a79e0d8a50249de1",
+        "type": "mqtt out",
+        "z": "79676b8bffba8ff3",
+        "name": "",
+        "topic": "devices/1234/messages/devicebound/",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "101ccc78c7342c89",
+        "x": 730,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "73250dd9ca7e520b",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "off",
+        "func": "// var data = Array(64).fill(0);\n// data[0] = 0x64;\n// data[1] = 0x06;\n// const buffer = Buffer.from(data);\n// const base64String = buffer.toString('base64');\n// const hexSt = buffer.toString('hex');\n// msg.payload = base64String.toString();\n// return msg;\n\nvar data = Array(40);\ndata[0] = 0x64;\ndata[1] = 6;\nconst buffer = Buffer.from(data);\nconst base64String = buffer.toString('base64');\n//msg.payload = base64String;\nmsg.payload = buffer\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 740,
+        "wires": [
+            [
+                "a79e0d8a50249de1"
+            ]
+        ]
+    },
+    {
+        "id": "6365cfc0cff6763c",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "on",
+        "func": "var data = Array(40);\ndata[0] = 0x64;\ndata[1] = 4;\nconst buffer = Buffer.from(data);\nconst base64String = buffer.toString('base64');\n//msg.payload = base64String;\nmsg.payload = buffer\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 700,
+        "wires": [
+            [
+                "a79e0d8a50249de1"
+            ]
+        ]
+    },
+    {
+        "id": "57d78f328488c89e",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "on",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 330,
+        "y": 700,
+        "wires": [
+            [
+                "6365cfc0cff6763c"
+            ]
+        ]
+    },
+    {
+        "id": "4933261d97cb563a",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "off",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 330,
+        "y": 740,
+        "wires": [
+            [
+                "73250dd9ca7e520b"
+            ]
+        ]
+    },
+    {
+        "id": "8fe0d6e91650f9e8",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update ",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "11_b1df3c9c246570ee5",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 330,
+        "y": 160,
+        "wires": [
+            [
+                "4027e782f58e62b4"
+            ]
+        ]
+    },
+    {
+        "id": "3920b818d79cc505",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "set order 9",
+        "func": "var uid         = msg.uid;\nvar data        = Array(32);\n\ndata[0]     = 100;\ndata[1]     = 9;\n\nconst buffer = Buffer.from(data);\nmsg.topic = \"devices/\"+uid+\"/messages/devicebound/\"\nmsg.payload = buffer;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 580,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "6c37bd246215e8ac",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 580,
+        "wires": [
+            [
+                "3920b818d79cc505"
+            ]
+        ]
+    },
+    {
+        "id": "0709aa55973514bb",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "tast",
+        "func": "var data = Array(32);\ndata[0]  = 100;\ndata[1]  = 90;\ndata[2]  = 255;\ndata[31]  = 1;\nconst buffer = Buffer.from(data);\nconst base64String = buffer.toString('base64');\n//msg.payload = base64String;\nmsg.topic = \"devices/\"+msg.uid+\"/messages/devicebound/\"\nmsg.payload = buffer\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 620,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "8ef2cb58d5430dee",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 620,
+        "wires": [
+            [
+                "0709aa55973514bb"
+            ]
+        ]
+    },
+    {
+        "id": "089335e332589a17",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "tast2",
+        "func": "var data = Array(32);\ndata[0]  = 100;\ndata[1]  = 29;\ndata[31]  = 1;\nconst buffer = Buffer.from(data);\nconst base64String = buffer.toString('base64');\n//msg.payload = base64String;\nmsg.topic = \"devices/\"+msg.uid+\"/messages/devicebound/\"\nmsg.payload = buffer\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 660,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "bb0f1fbbb84c8fe3",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "a7c2248d9694456686e",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 660,
+        "wires": [
+            [
+                "089335e332589a17"
+            ]
+        ]
+    },
+    {
+        "id": "7505a10cc380e429",
+        "type": "function",
+        "z": "79676b8bffba8ff3",
+        "name": "request event",
+        "func": "var data = Array(32);\ndata[0]  = 100;\ndata[1] = 2;\ndata[13] = 1;\nconst buffer = Buffer.from(data);\nconst base64String = buffer.toString('base64');\n//msg.payload = base64String;\nmsg.topic = \"devices/\"+msg.uid+\"/messages/event/\"\nmsg.payload = buffer\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 300,
+        "wires": [
+            [
+                "f70e32ad7f2af5b0"
+            ]
+        ]
+    },
+    {
+        "id": "96dbc315933b67d2",
+        "type": "inject",
+        "z": "79676b8bffba8ff3",
+        "name": "update 1234",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "uid",
+                "v": "1234",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 350,
+        "y": 300,
+        "wires": [
+            [
+                "7505a10cc380e429"
+            ]
+        ]
+    },
+    {
+        "id": "940d6bc3dd2d65e0",
+        "type": "mqtt-broker",
+        "name": "HOME SPEAK V2",
+        "broker": "mqtt-home.kmce.io",
+        "port": "15076",
+        "tls": "232b3cbe63bc0c17",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "5",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "101ccc78c7342c89",
+        "type": "mqtt-broker",
+        "name": "Millennium",
+        "broker": "http://mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "232b3cbe63bc0c17",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "emqxsl-ca(last).crt",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    }
+]

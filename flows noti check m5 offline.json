@@ -1,0 +1,583 @@
+[
+    {
+        "id": "b2ef29e439532b30",
+        "type": "comment",
+        "z": "18bd6e92f6f4d26b",
+        "name": "M5 MARQUE",
+        "info": "",
+        "x": 250,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "f57e920516e5c197",
+        "type": "inject",
+        "z": "18bd6e92f6f4d26b",
+        "name": "Trigger ทุก 10 นาที",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 290,
+        "y": 240,
+        "wires": [
+            [
+                "f36772a90ef5e835"
+            ]
+        ]
+    },
+    {
+        "id": "26a79bdf4af9fe46",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "set timestamp UID",
+        "func": "// var uid = msg.topic.split(\"/\");\n// flow.set('uidmarqM5' + uid + \".timestamp\", Date.now());\n\n// โค้ดใน input handler เช่น MQTT\nlet uid = msg.topic.split(\"/\")[1];\nflow.set(\"uidmarqM5\" + uid + \".timestamp\", Date.now());\n\nreturn msg;\n\n",
+        "outputs": 0,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "05cba3b5024c3487",
+        "type": "debug",
+        "z": "18bd6e92f6f4d26b",
+        "name": "debug 1190",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 720,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "11e363e50f58bcc6",
+        "type": "mqtt in",
+        "z": "18bd6e92f6f4d26b",
+        "name": "MARQM5",
+        "topic": "channel/+/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "3d748433ed5d91bc",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 240,
+        "y": 180,
+        "wires": [
+            [
+                "26a79bdf4af9fe46"
+            ]
+        ]
+    },
+    {
+        "id": "f36772a90ef5e835",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "setdata....M5",
+        "func": "// กำหนด Discord channel map → รายการอุปกรณ์ที่เกี่ยวข้อง\nvar channelMap = {\n    \"1366346863954890834\": [ \n        { uuid: \"w7hSW9qvwaWhep2y8h1\", project: \"719/40 (515)\"  },\n        { uuid: \"aqZ1OJhXM1xvZjYnmc5\", project: \"719/101 (457)\" },\n        { uuid: \"1hcB73kqK19rpSTJLhD\", project: \"719/137 (347)\" },\n        { uuid: \"kqnz74goB7lNrqKKwSU\", project: \"719/146 (203)\" },\n        { uuid: \"Tn7GmlsWCyMzhH5UHFn\", project: \"719/147 (331)\" },\n        { uuid: \"5B4XitBCdFu1WJnBkf7\", project: \"719/45 (616)\"  },\n        { uuid: \"j3IcJkhtctzTUICUBEq\", project: \"719/143 (338)\" },\n        { uuid: \"tzqv2JQd8VXhbI9xMOR\", project: \"719/55 (531)\"  },\n        { uuid: \"k3UN8xHxFbdnNEQxrqB\", project: \"719/144 (313)\" },\n        { uuid: \"WpnYIVpOztzkAqgKT6H\", project: \"719/120 (454)\" }\n    ]\n};\n\n// ข้อมูล database\nvar database = [\n    { uuid: \"w7hSW9qvwaWhep2y8h1\", nameuser: \"719/40 (515)\" },\n    { uuid: \"aqZ1OJhXM1xvZjYnmc5\", nameuser: \"719/101 (457)\" },\n    { uuid: \"1hcB73kqK19rpSTJLhD\", nameuser: \"719/137 (347)\" },\n    { uuid: \"kqnz74goB7lNrqKKwSU\", nameuser: \"719/146 (203)\" },\n    { uuid: \"Tn7GmlsWCyMzhH5UHFn\", nameuser: \"719/147 (331)\" },\n    { uuid: \"5B4XitBCdFu1WJnBkf7\", nameuser: \"719/45 (616)\" },\n    { uuid: \"j3IcJkhtctzTUICUBEq\", nameuser: \"719/143 (338)\" },\n    { uuid: \"tzqv2JQd8VXhbI9xMOR\", nameuser: \"719/55 (531)\" },\n    { uuid: \"k3UN8xHxFbdnNEQxrqB\", nameuser: \"719/144 (313)\" },\n    { uuid: \"WpnYIVpOztzkAqgKT6H\", nameuser: \"719/120 (454)\" }\n];\n\n// แปลง database เป็น Map เพื่อดึงชื่อได้ง่าย\nvar nameMap = {};\ndatabase.forEach(d => {\n    nameMap[d.uuid] = d.nameuser;\n});\n\nvar offlineDevices = [];\nvar onlineDevices = [];\n\nvar timeNow = Date.now();\nvar offLine = 20 * 60 * 1000; // 20 นาที\n\n// ตรวจสอบสถานะอุปกรณ์\nfor (let i = 0; i < database.length; i++) {\n    let device = database[i];\n    let uid = device.uuid;\n    let contextKey = 'uidmarqM5' + uid + \".timestamp\";\n    let lastTimeRaw = flow.get(contextKey);\n\n    if (lastTimeRaw === undefined) {\n        // node.warn(`Timestamp not found for ${uid} (context key: ${contextKey})`);\n        offlineDevices.push({\n            project: 'MARQ',\n            uid: uid,\n            status: 'M5 OFFLINE (no timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    let lastTime = Number(lastTimeRaw);\n    if (isNaN(lastTime)) {\n        node.warn(`Invalid timestamp value for ${uid}: ${lastTimeRaw}`);\n        offlineDevices.push({\n            project: 'MARQ',\n            uid: uid,\n            status: 'M5 OFFLINE (invalid timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    if (timeNow - lastTime <= offLine) {\n        onlineDevices.push({\n            project: 'MARQ',\n            uid: uid,\n            status: 'M5 ONLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    } else {\n        offlineDevices.push({\n            project: 'MARQ',\n            uid: uid,\n            status: 'M5 OFFLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    }\n}\n\n// node.warn(\"DEBUG START\");\n// node.warn(\"OFFLINE COUNT: \" + offlineDevices.length);\n// node.warn(\"ONLINE COUNT: \" + onlineDevices.length);\n// node.warn(\"CHANNEL MAP: \" + JSON.stringify(channelMap));\n\nfor (let channelId in channelMap) {\n    node.warn(\"Processing channelId: \" + channelId);\n\n    let devicesInChannel = channelMap[channelId];\n    let uids = devicesInChannel.map(d => d.uuid);\n\n    let offlineInChannel = offlineDevices.filter(d => uids.includes(d.uid));\n    let onlineInChannel = onlineDevices.filter(d => uids.includes(d.uid));\n\n    node.warn(`Channel ${channelId}: ${offlineInChannel.length} offline, ${onlineInChannel.length} online`);\n\n    let notificationMessage = \"\";\n\n    if (offlineInChannel.length > 0) {\n        notificationMessage += \"**⚠️ OFFLINE DEVICES!!**\\n\";\n        offlineInChannel.forEach(d => {\n            notificationMessage += `📡 PROJECT: ${d.project}\\n🆔 UID: ${d.uid}\\n❌ STATUS: ${d.status}\\n👤 NAME: ${d.name}\\n\\n`;\n        });\n    }\n\n    if (notificationMessage.length > 0) {\n        // node.warn(\"Sending to Discord channel: \" + channelId);\n        // node.warn(\"Message: \\n\" + notificationMessage);\n\n        node.send({\n            payload: notificationMessage,\n            channel: channelId\n        });\n    }\n}\nreturn null;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 240,
+        "wires": [
+            [
+                "05cba3b5024c3487",
+                "0af9210cdd872e48"
+            ]
+        ]
+    },
+    {
+        "id": "94ccc464b234c848",
+        "type": "comment",
+        "z": "18bd6e92f6f4d26b",
+        "name": "M5ROYCE",
+        "info": "",
+        "x": 240,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "befa9e23ee12739f",
+        "type": "inject",
+        "z": "18bd6e92f6f4d26b",
+        "name": "Trigger ทุก 10 นาที",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 290,
+        "y": 460,
+        "wires": [
+            [
+                "dae2a59e0d0818e1"
+            ]
+        ]
+    },
+    {
+        "id": "8f97e4a481454c8b",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "set timestamp UID",
+        "func": "// โค้ดใน input handler เช่น MQTT\nlet uid = msg.topic.split(\"/\")[1];\nflow.set(\"dataRM5\" + uid + \".timestamp\", Date.now());\n\nreturn msg;\n\n",
+        "outputs": 0,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "0d55bf33c1f5b507",
+        "type": "debug",
+        "z": "18bd6e92f6f4d26b",
+        "name": "debug 1191",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 720,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "4f1d52eb989b6712",
+        "type": "mqtt in",
+        "z": "18bd6e92f6f4d26b",
+        "name": "ROYCEM5",
+        "topic": "channel/+/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "c488ab2c2cdcd585",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 240,
+        "y": 400,
+        "wires": [
+            [
+                "8f97e4a481454c8b"
+            ]
+        ]
+    },
+    {
+        "id": "dae2a59e0d0818e1",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "setdata....M5",
+        "func": "// กำหนด Discord channel map → รายการอุปกรณ์ที่เกี่ยวข้อง\nvar channelMap = {\n    \"1366346863954890834\": [ \n        // { uuid: \"c00cb6b3451342b399fd\", project: \"คุณอัลเบิร์ท (61/27)\"}, \n        { uuid: \"8b73063fd26e4a1da6c6\", project: \"คุณณานิน (61/85)\"}, \n        // { uuid: \"cd2a2701433c4c078ff8\", project: \"Ron Chernin (61/69)\"}, \n        // { uuid: \"33067789f55c430586e\",  project: \"คุณศิระ\" },         \n        // { uuid: \"03025f3562cd43fbb5e\",  project: \"คุณฟีลิปป์\" },         \n        // { uuid: \"50c92ac597ea4546bdc\",  project: \"K.BOY (61/60)\" },         \n        { uuid: \"4759b805b23c4a54a5c\",  project: \"Mr.Hsu (61/118)\" }      \n    ]\n};\n\n// ข้อมูล database\nvar database = [\n    // { uuid: \"c00cb6b3451342b399fd\", nameuser: \"คุณอัลเบิร์ท (61/27)\" },\n    { uuid: \"8b73063fd26e4a1da6c6\", nameuser: \"คุณณานิน (61/85)\" },\n    // { uuid: \"cd2a2701433c4c078ff8\", nameuser: \"Ron Chernin (61/69)\" },\n    // { uuid: \"33067789f55c430586e\",  nameuser: \"คุณศิระ\" },\n    // { uuid: \"03025f3562cd43fbb5e\",  nameuser: \"คุณฟีลิปป์\" },\n    // { uuid: \"50c92ac597ea4546bdc\",  nameuser: \"K.BOY (61/60)\" },\n    { uuid: \"4759b805b23c4a54a5c\",  nameuser: \"Mr.Hsu (61/118)\" }\n];\n\n// แปลง database เป็น Map เพื่อดึงชื่อได้ง่าย\nvar nameMap = {};\ndatabase.forEach(d => {\n    nameMap[d.uuid] = d.nameuser;\n});\n\nvar offlineDevices = [];\nvar onlineDevices = [];\n\nvar timeNow = Date.now();\nvar offLine = 20 * 60 * 1000; // 20 นาที\n\n// ตรวจสอบสถานะอุปกรณ์\nfor (let i = 0; i < database.length; i++) {\n    let device = database[i];\n    let uid = device.uuid;\n    let contextKey = 'dataRM5' + uid + \".timestamp\";\n    let lastTimeRaw = flow.get(contextKey);\n\n    if (lastTimeRaw === undefined) {\n        node.warn(`Timestamp not found for ${uid} (context key: ${contextKey})`);\n        offlineDevices.push({\n            project: 'ROYCE',\n            uid: uid,\n            status: 'M5 OFFLINE (no timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    let lastTime = Number(lastTimeRaw);\n    if (isNaN(lastTime)) {\n        node.warn(`Invalid timestamp value for ${uid}: ${lastTimeRaw}`);\n        offlineDevices.push({\n            project: 'ROYCE',\n            uid: uid,\n            status: 'M5 OFFLINE (invalid timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    if (timeNow - lastTime <= offLine) {\n        onlineDevices.push({\n            project: 'ROYCE',\n            uid: uid,\n            status: 'M5 ONLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    } else {\n        offlineDevices.push({\n            project: 'ROYCE',\n            uid: uid,\n            status: 'M5 OFFLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    }\n}\n\n// node.warn(\"DEBUG START\");\n// node.warn(\"OFFLINE COUNT: \" + offlineDevices.length);\n// node.warn(\"ONLINE COUNT: \" + onlineDevices.length);\n// node.warn(\"CHANNEL MAP: \" + JSON.stringify(channelMap));\n\nfor (let channelId in channelMap) {\n    node.warn(\"Processing channelId: \" + channelId);\n\n    let devicesInChannel = channelMap[channelId];\n    let uids = devicesInChannel.map(d => d.uuid);\n\n    let offlineInChannel = offlineDevices.filter(d => uids.includes(d.uid));\n    let onlineInChannel = onlineDevices.filter(d => uids.includes(d.uid));\n\n    node.warn(`Channel ${channelId}: ${offlineInChannel.length} offline, ${onlineInChannel.length} online`);\n\n    let notificationMessage = \"\";\n\n    if (offlineInChannel.length > 0) {\n        notificationMessage += \"**⚠️ OFFLINE DEVICES!!**\\n\";\n        offlineInChannel.forEach(d => {\n            notificationMessage += `📡 PROJECT: ${d.project}\\n🆔 UID: ${d.uid}\\n❌ STATUS: ${d.status}\\n👤 NAME: ${d.name}\\n\\n`;\n        });\n    }\n\n    if (notificationMessage.length > 0) {\n        // node.warn(\"Sending to Discord channel: \" + channelId);\n        // node.warn(\"Message: \\n\" + notificationMessage);\n\n        node.send({\n            payload: notificationMessage,\n            channel: channelId\n        });\n    }\n}\nreturn null;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 460,
+        "wires": [
+            [
+                "0d55bf33c1f5b507",
+                "0af9210cdd872e48"
+            ]
+        ]
+    },
+    {
+        "id": "38ad94cc2869d643",
+        "type": "comment",
+        "z": "18bd6e92f6f4d26b",
+        "name": "M5Prosper",
+        "info": "",
+        "x": 240,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "7afb40a7d98bf6b8",
+        "type": "inject",
+        "z": "18bd6e92f6f4d26b",
+        "name": "Trigger ทุก 10 นาที",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 290,
+        "y": 680,
+        "wires": [
+            [
+                "57ab95aa211b51e1"
+            ]
+        ]
+    },
+    {
+        "id": "5e28a136858fcd68",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "set timestamp UID",
+        "func": "// โค้ดใน input handler เช่น MQTT\nlet uid = msg.topic.split(\"/\")[1];\nflow.set(\"uidPM5\" + uid + \".timestamp\", Date.now());\n\nreturn msg;\n\n",
+        "outputs": 0,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "b77524ca98f66012",
+        "type": "debug",
+        "z": "18bd6e92f6f4d26b",
+        "name": "debug 1192",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 720,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "cbd79696a483d19a",
+        "type": "mqtt in",
+        "z": "18bd6e92f6f4d26b",
+        "name": "PROSPERM5",
+        "topic": "channel/+/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "59743d41bdb510f2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 250,
+        "y": 620,
+        "wires": [
+            [
+                "5e28a136858fcd68"
+            ]
+        ]
+    },
+    {
+        "id": "57ab95aa211b51e1",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "setdata....M5",
+        "func": "// กำหนด Discord channel map → รายการอุปกรณ์ที่เกี่ยวข้อง\nvar channelMap = {\n    \"1366346863954890834\": [ \n        { uuid: \"80d3294bcd1741af803\", project: \"พงศ์เทพ\"}, \n        { uuid: \"2f8faf73580c4a18915\", project: \"ธัช ธงภักดิ์\"}, \n        { uuid: \"2d25e3f0282b44da97e\", project: \"พงศ์พล TREDER 3P\"}, \n        { uuid: \"e71360b485424206ae8\", project: \"FULL 3P\", }           \n    ]\n};\n\n// ข้อมูล database\nvar database = [\n        { uuid: \"80d3294bcd1741af803\", nameuser: \"พงศ์เทพ\"}, \n        { uuid: \"2f8faf73580c4a18915\", nameuser: \"ธัช ธงภักดิ์\"}, \n        { uuid: \"2d25e3f0282b44da97e\", nameuser: \"พงศ์พล TREDER 3P\"}, \n        { uuid: \"e71360b485424206ae8\", nameuser: \"FULL 3P\", } \n];\n\n// แปลง database เป็น Map เพื่อดึงชื่อได้ง่าย\nvar nameMap = {};\ndatabase.forEach(d => {\n    nameMap[d.uuid] = d.nameuser;\n});\n\nvar offlineDevices = [];\nvar onlineDevices = [];\n\nvar timeNow = Date.now();\nvar offLine = 20 * 60 * 1000; // 20 นาที\n\n// ตรวจสอบสถานะอุปกรณ์\nfor (let i = 0; i < database.length; i++) {\n    let device = database[i];\n    let uid = device.uuid;\n    let contextKey = 'uidPM5' + uid + \".timestamp\";\n    let lastTimeRaw = flow.get(contextKey);\n\n    if (lastTimeRaw === undefined) {\n        node.warn(`Timestamp not found for ${uid} (context key: ${contextKey})`);\n        offlineDevices.push({\n            project: 'PROSPER',\n            uid: uid,\n            status: 'M5 OFFLINE (no timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    let lastTime = Number(lastTimeRaw);\n    if (isNaN(lastTime)) {\n        node.warn(`Invalid timestamp value for ${uid}: ${lastTimeRaw}`);\n        offlineDevices.push({\n            project: 'PROSPER',\n            uid: uid,\n            status: 'M5 OFFLINE (invalid timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    if (timeNow - lastTime <= offLine) {\n        onlineDevices.push({\n            project: 'PROSPER',\n            uid: uid,\n            status: 'M5 ONLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    } else {\n        offlineDevices.push({\n            project: 'PROSPER',\n            uid: uid,\n            status: 'M5 OFFLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    }\n}\n\n// node.warn(\"DEBUG START\");\n// node.warn(\"OFFLINE COUNT: \" + offlineDevices.length);\n// node.warn(\"ONLINE COUNT: \" + onlineDevices.length);\n// node.warn(\"CHANNEL MAP: \" + JSON.stringify(channelMap));\n\nfor (let channelId in channelMap) {\n    node.warn(\"Processing channelId: \" + channelId);\n\n    let devicesInChannel = channelMap[channelId];\n    let uids = devicesInChannel.map(d => d.uuid);\n\n    let offlineInChannel = offlineDevices.filter(d => uids.includes(d.uid));\n    let onlineInChannel = onlineDevices.filter(d => uids.includes(d.uid));\n\n    node.warn(`Channel ${channelId}: ${offlineInChannel.length} offline, ${onlineInChannel.length} online`);\n\n    let notificationMessage = \"\";\n\n    if (offlineInChannel.length > 0) {\n        notificationMessage += \"**⚠️ OFFLINE DEVICES!!**\\n\";\n        offlineInChannel.forEach(d => {\n            notificationMessage += `📡 PROJECT: ${d.project}\\n🆔 UID: ${d.uid}\\n❌ STATUS: ${d.status}\\n👤 NAME: ${d.name}\\n\\n`;\n        });\n    }\n\n    if (notificationMessage.length > 0) {\n        // node.warn(\"Sending to Discord channel: \" + channelId);\n        // node.warn(\"Message: \\n\" + notificationMessage);\n\n        node.send({\n            payload: notificationMessage,\n            channel: channelId\n        });\n    }\n}\nreturn null;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 680,
+        "wires": [
+            [
+                "b77524ca98f66012",
+                "0af9210cdd872e48"
+            ]
+        ]
+    },
+    {
+        "id": "f9ac54d7cd45dbc9",
+        "type": "comment",
+        "z": "18bd6e92f6f4d26b",
+        "name": "M5MILLENNIUM",
+        "info": "",
+        "x": 260,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "042de00c196575b8",
+        "type": "inject",
+        "z": "18bd6e92f6f4d26b",
+        "name": "Trigger ทุก 10 นาที",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 290,
+        "y": 900,
+        "wires": [
+            [
+                "2886fc9c08fbbae4"
+            ]
+        ]
+    },
+    {
+        "id": "d937c1743af14855",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "set timestamp UID",
+        "func": "// โค้ดใน input handler เช่น MQTT\nlet uid = msg.topic.split(\"/\")[1];\nflow.set(\"dataMLNM5\" + uid + \".timestamp\", Date.now());\n\nreturn msg;\n\n",
+        "outputs": 0,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "24edfc3dabf83f6e",
+        "type": "debug",
+        "z": "18bd6e92f6f4d26b",
+        "name": "debug 1193",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 720,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "16d9fe3924b30cfa",
+        "type": "mqtt in",
+        "z": "18bd6e92f6f4d26b",
+        "name": "MILLENNIUMM5",
+        "topic": "channel/+/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "101ccc78c7342c89",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 260,
+        "y": 840,
+        "wires": [
+            [
+                "d937c1743af14855"
+            ]
+        ]
+    },
+    {
+        "id": "2886fc9c08fbbae4",
+        "type": "function",
+        "z": "18bd6e92f6f4d26b",
+        "name": "setdata....M5",
+        "func": "// กำหนด Discord channel map → รายการอุปกรณ์ที่เกี่ยวข้อง\nvar channelMap = {\n    \"1366346863954890834\": [ \n        { uuid: \"ecbaa46876bc4ffc97f\", project: \"Guillaume Verbal\"}, \n        { uuid: \"cddb3c670e0d490db82\", project: \"เจษฎาวัฒน์ เพรียบจริยวัฒน์\"}, \n        { uuid: \"17a3d4bd03484f57a1f\", project: \"คุณหมอสุพรชัย กองพัฒนากุล\"}, \n        { uuid: \"ffa026de448142adaab\", project: \"Bajaj Ishmit\", },\n        { uuid: \"919d1abfdfd14146a27\", project: \"Gopal Jagota\", }      \n    ]\n};\n\n// ข้อมูล database\nvar database = [\n        { uuid: \"ecbaa46876bc4ffc97f\", nameuser: \"Guillaume Verbal\"}, \n        { uuid: \"cddb3c670e0d490db82\", nameuser: \"เจษฎาวัฒน์ เพรียบจริยวัฒน์\"}, \n        { uuid: \"17a3d4bd03484f57a1f\", nameuser: \"คุณหมอสุพรชัย กองพัฒนากุล\"}, \n        { uuid: \"ffa026de448142adaab\", nameuser: \"Bajaj Ishmit\", },\n        { uuid: \"919d1abfdfd14146a27\", nameuser: \"Gopal Jagota\", }      \n];\n\n// แปลง database เป็น Map เพื่อดึงชื่อได้ง่าย\nvar nameMap = {};\ndatabase.forEach(d => {\n    nameMap[d.uuid] = d.nameuser;\n});\n\nvar offlineDevices = [];\nvar onlineDevices = [];\n\nvar timeNow = Date.now();\nvar offLine = 20 * 60 * 1000; // 20 นาที\n\n// ตรวจสอบสถานะอุปกรณ์\nfor (let i = 0; i < database.length; i++) {\n    let device = database[i];\n    let uid = device.uuid;\n    let contextKey = 'dataMLNM5' + uid + \".timestamp\";\n    let lastTimeRaw = flow.get(contextKey);\n\n    if (lastTimeRaw === undefined) {\n        // node.warn(`Timestamp not found for ${uid} (context key: ${contextKey})`);\n        offlineDevices.push({\n            project: 'MILLENNIUM',\n            uid: uid,\n            status: 'M5 OFFLINE (no timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    let lastTime = Number(lastTimeRaw);\n    if (isNaN(lastTime)) {\n        node.warn(`Invalid timestamp value for ${uid}: ${lastTimeRaw}`);\n        offlineDevices.push({\n            project: 'MILLENNIUM',\n            uid: uid,\n            status: 'M5 OFFLINE (invalid timestamp)',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n        continue;\n    }\n\n    if (timeNow - lastTime <= offLine) {\n        onlineDevices.push({\n            project: 'MILLENNIUM',\n            uid: uid,\n            status: 'M5 ONLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    } else {\n        offlineDevices.push({\n            project: 'MILLENNIUM',\n            uid: uid,\n            status: 'M5 OFFLINE',\n            name: nameMap[uid] || 'UNKNOWN'\n        });\n    }\n}\n\n// node.warn(\"DEBUG START\");\n// node.warn(\"OFFLINE COUNT: \" + offlineDevices.length);\n// node.warn(\"ONLINE COUNT: \" + onlineDevices.length);\n// node.warn(\"CHANNEL MAP: \" + JSON.stringify(channelMap));\n\nfor (let channelId in channelMap) {\n    node.warn(\"Processing channelId: \" + channelId);\n\n    let devicesInChannel = channelMap[channelId];\n    let uids = devicesInChannel.map(d => d.uuid);\n\n    let offlineInChannel = offlineDevices.filter(d => uids.includes(d.uid));\n    let onlineInChannel = onlineDevices.filter(d => uids.includes(d.uid));\n\n    node.warn(`Channel ${channelId}: ${offlineInChannel.length} offline, ${onlineInChannel.length} online`);\n\n    let notificationMessage = \"\";\n\n    if (offlineInChannel.length > 0) {\n        notificationMessage += \"**⚠️ OFFLINE DEVICES!!**\\n\";\n        offlineInChannel.forEach(d => {\n            notificationMessage += `📡 PROJECT: ${d.project}\\n🆔 UID: ${d.uid}\\n❌ STATUS: ${d.status}\\n👤 NAME: ${d.name}\\n\\n`;\n        });\n    }\n\n    if (notificationMessage.length > 0) {\n        // node.warn(\"Sending to Discord channel: \" + channelId);\n        // node.warn(\"Message: \\n\" + notificationMessage);\n\n        node.send({\n            payload: notificationMessage,\n            channel: channelId\n        });\n    }\n}\nreturn null;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 900,
+        "wires": [
+            [
+                "24edfc3dabf83f6e",
+                "0af9210cdd872e48"
+            ]
+        ]
+    },
+    {
+        "id": "0af9210cdd872e48",
+        "type": "discordSendMessage",
+        "z": "18bd6e92f6f4d26b",
+        "name": "EV",
+        "channel": "",
+        "token": "",
+        "x": 950,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "3d748433ed5d91bc",
+        "type": "mqtt-broker",
+        "name": "MARQ",
+        "broker": "http://mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "c488ab2c2cdcd585",
+        "type": "mqtt-broker",
+        "name": "ROYCE",
+        "broker": "mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "232b3cbe63bc0c17",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "59743d41bdb510f2",
+        "type": "mqtt-broker",
+        "name": "Prosper",
+        "broker": "mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "120",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "101ccc78c7342c89",
+        "type": "mqtt-broker",
+        "name": "Millennium",
+        "broker": "http://mqtt-ev.kmce.io",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "232b3cbe63bc0c17",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "emqxsl-ca(last).crt",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "e9e225bde97e3bf9",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-discord": "5.0.0"
+        }
+    }
+]
