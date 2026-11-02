@@ -2,7 +2,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp; A Computer Science graduate with a passion for bridging the gap between complex data and user-friendly interfaces. I specialize in <b>Front-end Development</b> and <b>UX/UI Design</b>, with unique experience in energy systems like <b>EV charging and Solar Cell monitoring</b>.
 
 <b>🚀 What I do</b>
-<br><b>&nbsp;&nbsp;&nbsp;&nbsp; UI/UX Design:</b> Crafting intuitive interfaces for Web & Mobile applications using Figma.</br>
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp; UX/UI Design:</b> Crafting intuitive interfaces for Web & Mobile applications using Figma.</br>
 <b>&nbsp;&nbsp;&nbsp;&nbsp; Front-end Development:</b> Building responsive web applications with Vue.js, HTML, CSS, and JavaScript 
 <br><b>&nbsp;&nbsp;&nbsp;&nbsp; IoT & Logic:</b> Experienced in using <b>Node-RED</b> and <b>MQTT</b> to connect hardware data with real-time dashboards.</br>
 
